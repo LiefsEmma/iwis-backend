@@ -2,13 +2,13 @@
 
 This is the FastAPI backend for the **Integrated Water Information System (IWIS)**. It handles data ingestion from water quality sensors, weather APIs, and citizen reports, storing them in a PostgreSQL database for analysis.
 
-## 🚀 Tech Stack
+## Tech Stack
 - **Framework:** FastAPI (Python)
 - **Database:** PostgreSQL
 - **ORM:** SQLAlchemy
 - **Data Analysis:** Pandas / Scikit-learn (Sprint 3)
 
-## 🛠️ Setup Instructions
+## Setup Instructions
 
 ### 1. Clone and Enter
 git clone https://github.com/LiefsEmma/iwis-backend.git
