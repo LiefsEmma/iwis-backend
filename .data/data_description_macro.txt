@@ -1,0 +1,247 @@
+Suggested citation:
+ DWS 2025. National Water Management System data extracted on 2025-10-14. Department of Water and Sanitation, Pretoria.
+
+Laboratory analysis for site 90214 (A2H083Q01) by:
+ Nat Dept: Water and Sanitation. (DWS-RQIS)
+Information extracted from D:/data_large/wq/wms.db, dated 2025-10-14 
+
+ Most analytical methods have changed through the years, as listed below.
+ For historical methods, see Analytical Methods Manuals TR136 and TR151 at https://www.dws.gov.za/iwqs/reports/tr.aspx
+
+ Be particularly careful when using pH data from 1978 to 1989 - https://www.dws.gov.za/iwqs/water_quality/NCMP/nwrqsr.aspx
+
+ These summary files now include method detection limits in columns with the suffix "_dl",  while substituting 0.5 * the detection limit for any result less than the detection limit.
+ The lists below show the range of detection limits per variable,  and the dates between which detection limits were applicable.
+ For results that include method detection limits per variable per date, please request full data files from the Contact email at the end of this file.
+
+Database site description:
+  Hartbeespoort Dam on Crocodile River: Down Stream Weir 
+
+Database site coordinates:
+ latitude -25.7188889 
+ longitude 27.843611 
+
+Data extraction:
+ 2025-10-14 20:07:36 using script barcode.R v 20.3 with the macro option, under R version 4.5.1 (2025-06-13 ucrt) 
+
+Abbreviations:
+
+mon_variable_abbr measure_unit_abbr mon_variable_name measure_unit_name mon_variable_id
+Ca-Diss-Water                         mg/L                                  Calcium                               Milligram per Litre                   52                                   
+Cl-Diss-Water                         mg/L                                  Chloride                              Milligram per Litre                   46                                   
+DMS-Tot-Water                         mg/L                                  Dissolved Major Salts                 Milligram per Litre                   63                                   
+EC-Phys-Water                         mS/m                                  Electrical Conductivity               Millisiemens per Metre                56                                   
+F-Diss-Water                          mg/L                                  Fluoride                              Milligram per Litre                   24                                   
+K-Diss-Water                          mg/L                                  Potassium                             Milligram per Litre                   50                                   
+KJEL N-Tot-Water                      mg/L                                  Kjeldahl Nitrogen                     Milligram per Litre                    9                                   
+Mg-Diss-Water                         mg/L                                  Magnesium                             Milligram per Litre                   32                                   
+Na-Diss-Water                         mg/L                                  Sodium                                Milligram per Litre                   30                                   
+NH4-N-Diss-Water                      mg/L                                  Ammonium Nitrogen                     Milligram per Litre                   13                                   
+NO3+NO2-N-Diss-Water                  mg/L                                  Nitrate + Nitrite Nitrogen            Milligram per Litre                   11                                   
+P-Tot-Water                           mg/L                                  Total Phosphorus                      Milligram per Litre                   37                                   
+pH-Diss-Water                         pH units                              pH                                    Units of pH                            3                                   
+PO4-P-Diss-Water                      mg/L                                  Ortho Phosphate as Phosphorus         Milligram per Litre                   39                                   
+Si-Diss-Water                         mg/L                                  Silicon                               Milligram per Litre                   34                                   
+SO4-Diss-Water                        mg/L                                  Sulphate                              Milligram per Litre                   42                                   
+TAL-Diss-Water                        mg/L                                  Total Alkalinity as Calcium Carbonate Milligram per Litre                   27                                   
+
+Dates when laboratory methods were in use (detection limit range in brackets):
+
+1979-05-22 13:05 to 2025-09-02 15:09 DMS-Tot-Water (1-2) Not a laboratory method.
+1979-05-22 13:05 to 2010-09-13 12:09 EC-Phys-Water (0.1-2) RQIS. EC. Automated Measurement, Temperature Compensated to 25 LT B0 Gt C
+2010-09-27 14:09 to 2018-05-29 14:05 EC-Phys-Water (0.1-2) RQIS. EC. Automated Measurement. Compensated to 25 LT B0 Gt C. Radiometer TIM870. M5003.1
+2013-07-29 13:07 to 2022-10-10 11:10 EC-Phys-Water (0.1-2) RQIS. EC Corrected at 25 LT B0 Gt C. Automated Determination of EC on Gallery. M5005.2
+2022-10-10 12:10 to 2025-09-02 15:09 EC-Phys-Water (0.1-2) RQIS. EC Corrected at 25 LT B0 Gt C. Automated Measurement. Mettler TOLEDOT9 Autotitrator. M5012.2
+1979-05-22 13:05 to 2010-09-13 12:09 pH-Diss-Water (2) PH. Automated Measurement - 2 Point Calibration. Instrument: Radiometer TTT85
+2010-09-27 14:09 to 2018-05-29 14:05 pH-Diss-Water (2) RQIS. pH. Automated Measurement. Radiometer TIM870. M5003.2
+2013-07-29 13:07 to 2022-10-10 11:10 pH-Diss-Water (2) RQIS. pH Corrected at 25 LT B0 Gt C. Automated Determination of pH on Gallery. M5005.1
+2022-10-10 12:10 to 2025-09-02 15:09 pH-Diss-Water (2) RQIS. pH. Automated Measurement. Mettler TOLEDOT9 Autotitrator. M5012.1
+1979-05-22 13:05 to 1996-08-27 14:08 Na-Diss-Water (0.338-5) RQIS. Na. Automated. Flame Emission. Lithium as Internal Standard. Air/Propane. Technicon Flame Photometer (Iv)
+1996-09-10 14:09 to 2008-05-12 17:05 Na-Diss-Water (0.338-5) RQIS. Na. Automated. Flame Emission. LP Gas. 0.45 LT B5 Gt M Membrane. Jenway Pfp 7
+2008-07-21 12:07 to 2013-08-12 10:08 Na-Diss-Water (0.338-5) RQIS. Na. Automated. Filter 0.45 LT B5 Gt M Membrane. Atomic Absorption Spectrometer Air/Acetylene - Spectraa 220 FS
+2008-09-01 13:09 to 2013-12-17 14:12 Na-Diss-Water (0.338-5) RQIS. Na. Automated. Filter 0.45 LT B5 Gt M Membrane. Atomic Absorption. Gbc Avanta. 330.2 nm
+2015-03-12 12:03 to 2016-11-02 11:11 Na-Diss-Water (0.338-5) RQIS. Na. Automated. Filter 0.45 LT B5 Gt M Membrane. Atomic Absorption. AA500. 330.23 nm. M5007.1
+2015-08-27 12:08 to 2022-11-07 12:11 Na-Diss-Water (0.338-5) RQIS. Na. Automated. Filter 0.45 LT B5 Gt M Membrane. Atomic Absorption. Gbc Savantaa. 330.2 nm. Method 5008.1
+2022-09-05 14:09 to 2025-09-02 15:09 Na-Diss-Water (0.338-5) RQIS. Na. Automated. Filter 0.45 LT B5 Gt M Membrane. Atomic Absorption. Agilent AAS 240 FS. 330.4NM. M5010.4
+1979-05-22 13:05 to 1996-08-27 14:08 K-Diss-Water (0.116-3) RQIS. K. Automated. Flame Emission. Lithium as Internal Standard. Air/Propane..Technicon Flame Photometer (Iv)
+1996-09-10 14:09 to 2008-05-12 17:05 K-Diss-Water (0.116-3) RQIS. K. Automated. Flame Emission. LP Gas. 0.45 LT B5 Gt M Membrane. Jenway Pfp 7
+2008-07-21 12:07 to 2013-12-17 14:12 K-Diss-Water (0.116-3) RQIS. K. Automated. Filter 0.45 LT B5 Gt M Membrane. Atomic Absorption. Gbc Avanta. 766.5 nm
+2015-03-12 12:03 to 2018-02-07 10:02 K-Diss-Water (0.116-3) RQIS. K. Automated. Filter 0.45 LT B5 Gt M Membrane. Atomic Absorption. AA500. 766.49 nm. M5007.2
+2015-09-24 08:09 to 2022-12-08 09:12 K-Diss-Water (0.116-3) RQIS. K. Automated. Filter 0.45 LT B5 Gt M Membrane. Atomic Absorption. Gbc Savantaa. 766.5 nm. Method 5008.2
+2022-09-05 14:09 to 2025-09-02 15:09 K-Diss-Water (0.116-3) RQIS. K. Automated. Filter 0.45 LT B5 Gt M Membrane. Atomic Absorption. Agilent AAS 240 FS. 766.5NM. M5010.3
+1979-05-22 13:05 to 2008-05-12 17:05 Ca-Diss-Water (0.13-2.5) RQIS. CA. Automated. AA Spectrophotometer. Potassium Ionisation Buffer. Air/Acetylene. 0.45 LT B5 Gt M. Varian AA-1275. 422.7 nm
+2008-07-21 12:07 to 2018-02-07 10:02 Ca-Diss-Water (0.13-2.5) RQIS. CA. Automated. Filter 0.45 LT B5 Gt M Membrane. Photometric Determination. Aquakem 200/250. 660 nm. M5001.2
+2017-06-29 08:06 to 2017-06-29 08:06 Ca-Diss-Water (0.13-2.5) RQIS. CA. Automated. Filter 0.45 LT B5 Gt M Membrane. Atomic Absorption. Agilent AAS 240 FS. M5010.1
+2022-07-18 11:07 to 2022-09-05 14:09 Ca-Diss-Water (0.13-2.5) RQIS. CA. ICP Emission Spectroscopy. Filter 0.45 LT B5 Gt M Membrane. Spectro Blue II Ti. 422.673 nm. M2014
+2022-10-10 11:10 to 2023-06-08 10:06 Ca-Diss-Water (0.13-2.5) RQIS. CA. Photometric. Filter 0.45 LT B5 Gt M Membrane. Smartchem. 660 nm. M5009.1
+2025-09-02 15:09 to 2025-09-02 15:09 Ca-Diss-Water (0.13-2.5) RQIS. CA. Automated. Filter 0.45 LT B5 Gt M Membrane. Photometric Determination. Gallery. 660 nm. M5005.3
+1979-05-22 13:05 to 2008-05-12 17:05 Mg-Diss-Water (0.052-2) RQIS. Mg. Automated. AA Spectrophotometer. Potassium Ionization Buffer. Air/Acetylene. 0.45 LT B5 Gt M. Varian AA-1275. 285.2 nm
+2008-07-21 12:07 to 2018-02-07 10:02 Mg-Diss-Water (0.052-2) RQIS. Mg. Automated. Filter 0.45 LT B5 Gt M Membrane. Photometric Determination. Aquakem. 200/250 520 nm. M5001.4
+2017-06-29 08:06 to 2017-06-29 08:06 Mg-Diss-Water (0.052-2) RQIS. Mg. Automated. Filter 0.45 LT B5 Gt M Membrane. Atomic Absorption. Agilent AAS 240 FS. M5010.2
+2022-07-18 11:07 to 2022-09-05 14:09 Mg-Diss-Water (0.052-2) RQIS. Mg. ICP Emission Spectroscopy. Filter 0.45 LT B5 Gt M Membrane. Spectro Blue II Ti. 279.079 nm. M2014
+2022-10-10 11:10 to 2023-06-08 10:06 Mg-Diss-Water (0.052-2) RQIS. Mg. Photometric. Filter 0.45 LT B5 Gt M Membrane. Smartchem. 520 nm. M5009.2
+2025-09-02 15:09 to 2025-09-02 15:09 Mg-Diss-Water (0.052-2) RQIS. Mg. Automated. Filter 0.45 LT B5 Gt M Membrane. Photometric Determination. Gallery. 510 nm. M5005.5
+1979-05-22 13:05 to 1989-03-20 08:03 Cl-Diss-Water (0.09-10) RQIS. Cl. Automated. Colorimetric. Ferric Thiocyanate. Technicon Auto Analyzer. 480 nm
+1992-11-03 16:11 to 2008-07-07 14:07 Cl-Diss-Water (0.09-10) RQIS. Cl. Automated. Colorimetric. Ferric Thiocyanate. 0.45 LT B5 Gt M Membrane. TRAACS. 480 nm
+2008-07-21 12:07 to 2018-05-29 14:05 Cl-Diss-Water (0.09-10) RQIS. Cl. Automated. Filter 0.45 LT B5 Gt M Membrane. Photometric Determination. Aquakem 200/250. 480 nm. M5001.3
+2014-08-13 11:08 to 2025-09-02 15:09 Cl-Diss-Water (0.09-10) RQIS. Cl. Automated. Filter 0.45 LT B5 Gt M Membrane. Photometric Determination. Gallery. 480 nm. M5005.4
+1979-05-22 13:05 to 1989-03-20 08:03 SO4-Diss-Water (0.75-6) RQIS. SO4. Automated. Colorimetric. Turbidity Measurement. Technicon Auto Analyzer. 405 nm
+1992-11-03 16:11 to 2008-07-07 14:07 SO4-Diss-Water (0.75-6) RQIS. SO4. Automated. Colorimetric. Turbidimetric. 0.45 LT B5 Gt M Membrane. TRAACS. 420 nm
+2008-07-21 12:07 to 2018-05-29 14:05 SO4-Diss-Water (0.75-6) RQIS. SO4. Automated. Filter 0.45 LT B5 Gt M Membrane. Photometric Determination. Aquakem 200/250. 420NM. M5001.9
+2014-08-13 11:08 to 2025-09-02 15:09 SO4-Diss-Water (0.75-6) RQIS. SO4. Automated. Filter 0.45 LT B5 Gt M Membrane. Photometric Determination. Gallery. 420 nm. M5005.6
+1979-05-22 13:05 to 2008-06-09 14:06 TAL-Diss-Water (4-30) RQIS. TAL. Automated. Colorimetric. Bromophenol Blue. 0.45 LT B5 Gt M Membrane. Technicon Auto Analyzer. 600 nm
+2008-09-01 13:09 to 2018-05-29 14:05 TAL-Diss-Water (4-30) RQIS. TAL. Automated. Filter 0.45 LT B5 Gt M Membrane. Photometric Determination. Aquakem 200/250. 600 nm. M5001.1
+2022-07-18 11:07 to 2025-09-02 15:09 TAL-Diss-Water (4-30) RQIS. TAL. Automated. Filter 0.45 LT B5 Gt M Membrane. Photometric Determination. Gallery. 600 nm. M5005.7
+1979-05-22 13:05 to 2008-06-09 14:06 F-Diss-Water (0.03-0.2) RQIS. F. Automated. Ion Selective Electrode. 0.45 LT B5 Gt M Membrane. Technicon Auto Analyzer
+2009-03-30 11:03 to 2025-09-02 15:09 F-Diss-Water (0.03-0.2) RQIS. F. Automated. Filter 0.45 LT B5 Gt M Membrane. Flow Injection Analysis. Lachat Quikchem 8500 Series 2. M5004.1
+2013-07-01 13:07 to 2017-10-02 12:10 F-Diss-Water (0.03-0.2) RQIS. F. Automated. Filter 0.45 LT B5 Gt M Membrane. F. Photometric Determination. 630 nm. Aquakem 250. M5001.13
+2022-10-10 12:10 to 2023-04-18 14:04 F-Diss-Water (0.03-0.2) RQIS. F. Automated. Filter 0.45 LT B5 Gt M Membrane. Photometric Determination. Gallery. 620 nm. M5005.13
+1979-05-22 13:05 to 1989-03-20 08:03 PO4-P-Diss-Water (0.005-0.023) RQIS. PO4-P. Automated. Colorimetric. Ortho-Phosphate as Phosphomolybdate. Technicon Auto Analyzer. 660 nm
+1992-11-03 16:11 to 2008-07-07 14:07 PO4-P-Diss-Water (0.005-0.023) RQIS. PO4-P. Automated. Colorimetric. Ortho-Phosphate as Phosphomolybdate. 0.45 LT B5 Gt M Membrane Filter. TRAACS. 660 nm
+2008-09-01 13:09 to 2018-05-29 14:05 PO4-P-Diss-Water (0.005-0.023) RQIS. PO4-P. Automated. Filter 0.45 LT B5 Gt M Membrane. Photometric Determination. Aquakem 200/250. 880 nm. M5001.7
+2022-07-18 11:07 to 2025-09-02 15:09 PO4-P-Diss-Water (0.005-0.023) RQIS. PO4-P. Automated. Filter 0.45 LT B5 Gt M Membrane. Photometric Determination. Gallery. 660 nm. M5005.9
+1986-05-20 08:05 to 1989-03-20 08:03 P-Tot-Water (0.005-0.03) RQIS. TP. Automated. H2SO4-(NH4) 2S2O8 Digestion. Colorimetric. Phosphomolybdate. Technicon Auto Analyzer. 660 nm
+1992-11-03 16:11 to 2008-07-07 14:07 P-Tot-Water (0.005-0.03) RQIS. TP. Automated. H2SO4-(NH4) 2S2O8 Digestion. Colorimetric. Phosphomolybdate. TRAACS. 660 nm
+2008-09-01 13:09 to 2018-05-29 14:05 P-Tot-Water (0.005-0.03) RQIS. TP. Automated. Filter 0.45 LT B5 Gt M Membrane. Photometric Determination. Aquakem 200/250. 880 nm. M5001.12
+2014-08-13 11:08 to 2023-06-08 10:06 P-Tot-Water (0.005-0.03) RQIS. TP. Automated. Filter 0.45 LT B5 Gt M Membrane. Photometric Determination. Gallery. 880 nm. M5005.12
+1979-05-22 13:05 to 1989-03-20 08:03 NO3+NO2-N-Diss-Water (0.01-0.11) NO3+NO2-N. Automated. Colorimetric. Cadmium Reduction, Diazo Dye. Technicon Auto Analyzer. 520.0 nm
+1992-11-03 16:11 to 2008-07-07 14:07 NO3+NO2-N-Diss-Water (0.01-0.11) RQIS. NO3+NO2-N. Automated. Colorimetric. Cadmium Reduction, Diazo Dye. 0.45 LT B5 Gt M Membrane. TRAACS. 520.0 nm
+2008-11-10 14:11 to 2018-05-29 14:05 NO3+NO2-N-Diss-Water (0.01-0.11) RQIS. NO3+NO2-N. Automated. Filter 0.45 LT B5 Gt M Membrane. Photometric. Aquakem 200/250. 540 nm. M5001.11
+2022-07-18 11:07 to 2025-09-02 15:09 NO3+NO2-N-Diss-Water (0.01-0.11) RQIS. NO3+NO2-N. Automated. Filter 0.45 LT B5 Gt M Membrane. Photometric Determination. Gallery. 540 nm. M5005.14
+1979-05-22 13:05 to 1989-03-20 08:03 NH4-N-Diss-Water (0.03-0.1) RQIS. NH4-N. Automated. Colorimetric. Indophenol-Blue. Technicon Auto Analyzer. 630 nm
+1992-11-03 16:11 to 2008-07-07 14:07 NH4-N-Diss-Water (0.03-0.1) RQIS. NH4-N. Automated. Colorimetric. Indophenol-Blue. 0.45 LT B5 Gt M Membrane. TRAACS. 630 nm
+2008-09-01 13:09 to 2018-05-29 14:05 NH4-N-Diss-Water (0.03-0.1) RQIS. NH4-N. Automated. Filter 0.45 LT B5 Gt M Membrane. Photometric. Aquakem 200/250. 660 nm. M5001.5
+2022-07-18 11:07 to 2025-09-02 15:09 NH4-N-Diss-Water (0.03-0.1) RQIS. NH4-N. Automated. Filter 0.45 LT B5 Gt M Membrane. Photometric Determination. Gallery. 660 nm. M5005.8
+1986-05-20 08:05 to 1989-03-20 08:03 KJEL N-Tot-Water (0.04-0.3) RQIS. Kn. K2SO4/H2SO4 Digestion. Automated. Colorimetric. Indophenol-Blue. 630.0 nm. Technicon Autoanalyzer
+1992-11-03 16:11 to 2008-07-07 14:07 KJEL N-Tot-Water (0.04-0.3) RQIS. Kn. K2SO4/H2SO4 Digestion. Automated. Colorimetric. Indophenol-Blue. 630.0 nm. TRAACS
+2008-09-01 13:09 to 2018-05-29 14:05 KJEL N-Tot-Water (0.04-0.3) RQIS. Kn. Automated. Filter 0.45 LT B5 Gt M Membrane. Photometric Determination. Aquakem 200/250. 660 nm. M5001.10
+2014-08-13 11:08 to 2025-09-02 15:09 KJEL N-Tot-Water (0.04-0.3) RQIS. Kn. Automated. Filter 0.45 LT B5 Gt M Membrane. Photometric. Gallery. 660 nm. M5005.11
+1979-05-22 13:05 to 1989-03-20 08:03 Si-Diss-Water (0.1-1) RQIS. Si. Automated. Colorimetric. Molybdate Blue. Technicon Auto Analyzer. 660 nm
+1992-11-03 16:11 to 2008-07-07 14:07 Si-Diss-Water (0.1-1) RQIS. Si. Automated. Colorimetric. Molybdate Blue. 0.45 LT B5 Gt M Membrane. TRAACS. 660 nm
+2008-09-01 13:09 to 2018-05-29 14:05 Si-Diss-Water (0.1-1) RQIS. Si. Automated. Filter 0.45 LT B5 Gt M Membrane. Photometric Determination. Aquakem 200/250. 700 nm. M5001.8
+2017-12-14 08:12 to 2025-09-02 15:09 Si-Diss-Water (0.1-1) RQIS. Si. Automated. Filter 0.45 LT B5 Gt M Membrane. Photometric Determination.Gallery. 700 nm. M5005.10
+
+Dates when detection limits were in effect - they may overlap:
+
+1979-05-22 13:05 to 1999-09-14 13:09 DMS-Tot-Water detection limit = 1
+2005-10-31 14:10 to 2005-10-31 14:10 DMS-Tot-Water detection limit = 2
+1979-05-22 13:05 to 2022-11-07 12:11 EC-Phys-Water detection limit = 1
+2001-05-08 14:05 to 2025-09-02 15:09 EC-Phys-Water detection limit = 2
+2001-11-06 13:11 to 2010-12-20 14:12 EC-Phys-Water detection limit = 0.1
+1979-05-22 13:05 to 2025-09-02 15:09 pH-Diss-Water detection limit = 2
+1979-05-22 13:05 to 2010-08-16 12:08 Na-Diss-Water detection limit = 2
+2008-09-01 13:09 to 2011-01-31 11:01 Na-Diss-Water detection limit = 0.338
+2010-10-11 13:10 to 2011-08-01 11:08 Na-Diss-Water detection limit = 0.442
+2010-12-20 14:12 to 2011-02-28 11:02 Na-Diss-Water detection limit = 1.92
+2011-05-23 10:05 to 2016-11-02 11:11 Na-Diss-Water detection limit = 3
+2011-07-18 14:07 to 2022-11-07 12:11 Na-Diss-Water detection limit = 4
+2015-08-27 12:08 to 2018-02-07 10:02 Na-Diss-Water detection limit = 1.6
+2022-07-18 11:07 to 2025-09-02 15:09 Na-Diss-Water detection limit = 5
+1979-05-22 13:05 to 2008-05-12 17:05 K-Diss-Water detection limit = 0.3
+2008-08-18 13:08 to 2011-08-01 11:08 K-Diss-Water detection limit = 0.116
+2011-05-23 10:05 to 2025-09-02 15:09 K-Diss-Water detection limit = 2
+2015-03-12 12:03 to 2018-02-07 10:02 K-Diss-Water detection limit = 1
+2015-09-24 08:09 to 2017-01-11 15:01 K-Diss-Water detection limit = 0.8
+2016-12-15 11:12 to 2017-10-02 12:10 K-Diss-Water detection limit = 2.5
+2017-08-24 11:08 to 2022-11-07 12:11 K-Diss-Water detection limit = 3
+1979-05-22 13:05 to 2023-06-08 10:06 Ca-Diss-Water detection limit = 1
+2014-04-10 13:04 to 2018-02-07 10:02 Ca-Diss-Water detection limit = 2.5
+2017-06-29 08:06 to 2017-06-29 08:06 Ca-Diss-Water detection limit = 0.7
+2017-08-07 11:08 to 2025-09-02 15:09 Ca-Diss-Water detection limit = 2
+2022-07-18 11:07 to 2022-11-07 12:11 Ca-Diss-Water detection limit = 0.13
+1979-05-22 13:05 to 2023-06-08 10:06 Mg-Diss-Water detection limit = 1
+2008-08-18 13:08 to 2018-02-07 10:02 Mg-Diss-Water detection limit = 1.5
+2017-06-29 08:06 to 2017-06-29 08:06 Mg-Diss-Water detection limit = 0.94
+2022-07-18 11:07 to 2022-11-07 12:11 Mg-Diss-Water detection limit = 0.052
+2025-09-02 15:09 to 2025-09-02 15:09 Mg-Diss-Water detection limit = 2
+1979-05-22 13:05 to 2025-09-02 15:09 Cl-Diss-Water detection limit = 3
+1999-06-22 14:06 to 2003-09-23 13:09 Cl-Diss-Water detection limit = 10
+2001-11-06 13:11 to 2005-01-24 13:01 Cl-Diss-Water detection limit = 5
+2005-02-07 13:02 to 2008-07-07 14:07 Cl-Diss-Water detection limit = 4
+2008-08-18 13:08 to 2012-02-27 10:02 Cl-Diss-Water detection limit = 0.9
+2010-10-11 13:10 to 2011-08-01 11:08 Cl-Diss-Water detection limit = 0.09
+2012-01-20 12:01 to 2015-11-04 10:11 Cl-Diss-Water detection limit = 1
+2014-08-13 11:08 to 2018-02-07 10:02 Cl-Diss-Water detection limit = 2
+2018-04-17 13:04 to 2018-05-29 14:05 Cl-Diss-Water detection limit = 1.6
+1979-05-22 13:05 to 2008-07-07 14:07 SO4-Diss-Water detection limit = 4
+2001-11-06 13:11 to 2005-01-24 13:01 SO4-Diss-Water detection limit = 6
+2008-08-18 13:08 to 2011-01-31 11:01 SO4-Diss-Water detection limit = 0.75
+2010-10-11 13:10 to 2015-11-19 14:11 SO4-Diss-Water detection limit = 3
+2014-08-13 11:08 to 2018-02-07 10:02 SO4-Diss-Water detection limit = 1.2
+2018-01-08 13:01 to 2018-05-29 14:05 SO4-Diss-Water detection limit = 2
+2022-07-18 11:07 to 2025-09-02 15:09 SO4-Diss-Water detection limit = 1.5
+1979-05-22 13:05 to 2003-09-23 13:09 TAL-Diss-Water detection limit = 4
+2001-11-06 13:11 to 2011-01-31 11:01 TAL-Diss-Water detection limit = 8
+2010-10-11 13:10 to 2014-03-26 13:03 TAL-Diss-Water detection limit = 5
+2014-04-10 13:04 to 2025-09-02 15:09 TAL-Diss-Water detection limit = 10
+2017-08-07 11:08 to 2018-05-29 14:05 TAL-Diss-Water detection limit = 30
+1979-05-22 13:05 to 2017-10-02 12:10 F-Diss-Water detection limit = 0.1
+2001-11-06 13:11 to 2005-01-24 13:01 F-Diss-Water detection limit = 0.2
+2010-08-02 16:08 to 2025-09-02 15:09 F-Diss-Water detection limit = 0.05
+2022-10-10 12:10 to 2023-04-18 14:04 F-Diss-Water detection limit = 0.03
+1979-05-22 13:05 to 2001-04-24 14:04 PO4-P-Diss-Water detection limit = 0.005
+2001-05-08 14:05 to 2008-07-07 14:07 PO4-P-Diss-Water detection limit = 0.011
+2001-11-06 13:11 to 2005-01-24 13:01 PO4-P-Diss-Water detection limit = 0.023
+2008-09-01 13:09 to 2011-01-31 11:01 PO4-P-Diss-Water detection limit = 0.012
+2010-10-11 13:10 to 2018-05-29 14:05 PO4-P-Diss-Water detection limit = 0.01
+2014-04-10 13:04 to 2025-09-02 15:09 PO4-P-Diss-Water detection limit = 0.02
+1986-05-20 08:05 to 2001-04-24 14:04 P-Tot-Water detection limit = 0.005
+2001-06-05 14:06 to 2003-09-23 13:09 P-Tot-Water detection limit = 0.009
+2001-11-06 13:11 to 2005-01-24 13:01 P-Tot-Water detection limit = 0.03
+2005-02-07 13:02 to 2018-05-29 14:05 P-Tot-Water detection limit = 0.01
+2008-09-01 13:09 to 2011-01-31 11:01 P-Tot-Water detection limit = 0.006
+2010-10-11 13:10 to 2014-03-26 13:03 P-Tot-Water detection limit = 0.012
+2014-04-10 13:04 to 2023-06-08 10:06 P-Tot-Water detection limit = 0.02
+2017-11-01 11:11 to 2017-11-01 11:11 P-Tot-Water detection limit = 0.007
+1979-05-22 13:05 to 2003-09-23 13:09 NO3+NO2-N-Diss-Water detection limit = 0.04
+2001-11-06 13:11 to 2005-01-24 13:01 NO3+NO2-N-Diss-Water detection limit = 0.11
+2005-02-07 13:02 to 2008-07-07 14:07 NO3+NO2-N-Diss-Water detection limit = 0.08
+2008-11-10 14:11 to 2011-01-31 11:01 NO3+NO2-N-Diss-Water detection limit = 0.01
+2010-10-11 13:10 to 2014-03-26 13:03 NO3+NO2-N-Diss-Water detection limit = 0.05
+2014-04-10 13:04 to 2025-09-02 15:09 NO3+NO2-N-Diss-Water detection limit = 0.1
+2017-08-07 11:08 to 2018-05-29 14:05 NO3+NO2-N-Diss-Water detection limit = 0.06
+1979-05-22 13:05 to 2008-07-07 14:07 NH4-N-Diss-Water detection limit = 0.04
+2001-11-06 13:11 to 2005-01-24 13:01 NH4-N-Diss-Water detection limit = 0.03
+2008-09-01 13:09 to 2025-09-02 15:09 NH4-N-Diss-Water detection limit = 0.05
+2014-04-10 13:04 to 2018-05-29 14:05 NH4-N-Diss-Water detection limit = 0.1
+1986-05-20 08:05 to 2001-04-24 14:04 KJEL N-Tot-Water detection limit = 0.04
+2001-05-08 14:05 to 2003-09-23 13:09 KJEL N-Tot-Water detection limit = 0.19
+2001-11-06 13:11 to 2005-01-24 13:01 KJEL N-Tot-Water detection limit = 0.3
+2005-02-07 13:02 to 2006-02-20 15:02 KJEL N-Tot-Water detection limit = 0.05
+2006-03-06 12:03 to 2011-01-31 11:01 KJEL N-Tot-Water detection limit = 0.09
+2010-10-11 13:10 to 2025-09-02 15:09 KJEL N-Tot-Water detection limit = 0.1
+2014-04-10 13:04 to 2018-05-29 14:05 KJEL N-Tot-Water detection limit = 0.2
+1979-05-22 13:05 to 2003-09-23 13:09 Si-Diss-Water detection limit = 0.4
+2001-11-06 13:11 to 2005-01-24 13:01 Si-Diss-Water detection limit = 0.6
+2005-02-07 13:02 to 2008-07-07 14:07 Si-Diss-Water detection limit = 0.8
+2008-09-01 13:09 to 2014-03-26 13:03 Si-Diss-Water detection limit = 0.125
+2014-04-10 13:04 to 2017-10-16 13:10 Si-Diss-Water detection limit = 1
+2017-11-01 11:11 to 2018-05-29 14:05 Si-Diss-Water detection limit = 0.1
+2022-07-18 11:07 to 2025-09-02 15:09 Si-Diss-Water detection limit = 0.3
+
+
+Disclaimer:
+
+While staff have taken due care in preparing these results, the Department of Water and Sanitation cannot be held responsible for the accuracy of data provided nor for interpretations made.
+
+Scientific complications in the attached interpretation or accompanying graphs are beyond the scope of this report.
+
+Please inform us of any results or site descriptions that appear to be incorrect.
+
+
+Contact:
+
+For data directly from the WMS database, please contact Resource Quality Information Services, Department of Water and Sanitation.
+www.dws.gov.za/iwqs/ 
+Landline: +27 12 808 9610 (frequently out of order)
+Cell: +27 82 908 2895, or see https://www.dws.gov.za/iwqs/egotour/staflist/callus.aspx
+Fax: +27 12 808 0338
+
+For official correspondence, please write to:
+The Director,
+Resource Quality Information Services,
+Department of Water and Sanitation,
+Private Bag X313
+Pretoria
+South Africa
+0001
