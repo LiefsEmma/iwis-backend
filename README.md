@@ -6,7 +6,7 @@ This is the FastAPI backend for the **Integrated Water Information System (IWIS)
 - **Framework:** FastAPI (Python)
 - **Database:** PostgreSQL
 - **ORM:** SQLAlchemy
-- **Data Analysis:** Pandas / Scikit-learn (Sprint 3)
+- **Data Analysis:** Pandas, Numpy, Seaborn, Plotly
 
 ## Setup Instructions
 
