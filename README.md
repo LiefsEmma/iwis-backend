@@ -12,7 +12,7 @@ This is the FastAPI backend for the **Integrated Water Information System (IWIS)
 
 ### 1. Clone and Enter
 ```bash
-git clone https://https://github.com/LiefsEmma/iwis-backend.git
+git clone
 cd iwis-backend
 ```
 
