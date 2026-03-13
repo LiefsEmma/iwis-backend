@@ -1,54 +1,56 @@
-# IWIS Backend - Hartbeespoort Dam Monitoring
+# IWIS Backend - FastAPI + PostgreSQL
 
-This is the FastAPI backend for the **Integrated Water Information System (IWIS)**. It handles data ingestion from water quality sensors, weather APIs, and citizen reports, storing them in a PostgreSQL database for analysis.
+This backend powers the **Integrated Water Information System (IWIS)** with:
+- FastAPI for API endpoints
+- PostgreSQL for environmental data storage
+- latitude/longitude coordinates for map data
 
 ## Tech Stack
-- **Framework:** FastAPI (Python)
+- **Framework:** FastAPI
 - **Database:** PostgreSQL
 - **ORM:** SQLAlchemy
-- **Data Analysis:** Pandas, Numpy, Seaborn, Plotly
 
-## Setup Instructions
+## Local Setup
 
-### 1. Clone and Enter
-```bash
-git clone
-cd iwis-backend
-```
-
-### 2. Virtual Environment
-
+### 1. Create and activate a virtual environment
 ```bash
 python3 -m venv venv
-source venv/bin/activate # On windows, run .\venv\Scripts\activate
+source venv/bin/activate
 ```
 
-
-### 3. Install Dependencies
+### 2. Install dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Run the Server
+### 3. Create `.env`
+Copy `.env.example` to `.env` and configure your DB connection:
+
+```env
+DATABASE_URL=postgresql+psycopg2://postgres:postgres@localhost:5432/iwis
 ```
+
+### 4. Start the API
+```bash
 fastapi dev app/main.py
 ```
 
-The API will be available at http://127.0.0.1:8000.
+API base URL: `http://127.0.0.1:8000`
 
-## Project Structure
-app/main.py: Entry point and API routes.
+## Main Endpoints
+- `GET /health`
+- `POST /sensors`
+- `GET /sensors`
+- `POST /water-readings`
+- `GET /water-readings`
+- `POST /weather-readings`
+- `GET /weather-readings`
+- `POST /citizen-reports`
+- `GET /citizen-reports`
+- `GET /map/sensors` (GeoJSON)
+- `GET /map/citizen-reports` (GeoJSON)
 
-app/models.py: Database table definitions (Postgres).
-
-app/database.py: Connection logic.
-
-app/schemas.py: Data validation for sensor inputs.
-
-## API Documentation
-Once the server is running, visit:
-
-Swagger UI: http://127.0.0.1:8000/docs
-
-ReDoc: http://127.0.0.1:8000/redoc
+## API Docs
+- Swagger UI: `http://127.0.0.1:8000/docs`
+- ReDoc: `http://127.0.0.1:8000/redoc`
 
