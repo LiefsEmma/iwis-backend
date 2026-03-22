@@ -1,0 +1,108 @@
+Suggested citation:
+ DWS 2025. National Water Management System data extracted on 2025-09-13. Department of Water and Sanitation, Pretoria.
+
+Laboratory analysis for site 1000000383 (2428AC00453) by:
+ Nat Dept: Water and Sanitation. (DWS-RQIS)
+Information extracted from /Users/michaelsilberbauer/Dropbox/wq/wms.db, dated 2025-08-05 
+
+ Most analytical methods have changed through the years, as listed below.
+ For historical methods, see Analytical Methods Manuals TR136 and TR151 at https://www.dws.gov.za/iwqs/reports/tr.aspx
+
+ Be particularly careful when using pH data from 1978 to 1989 - https://www.dws.gov.za/iwqs/water_quality/NCMP/nwrqsr.aspx
+
+ These summary files now include method detection limits in columns with the suffix "_dl",  while substituting 0.5 * the detection limit for any result less than the detection limit.
+ The lists below show the range of detection limits per variable,  and the dates between which detection limits were applicable.
+ For results that include method detection limits per variable per date, please request full data files from the Contact email at the end of this file.
+
+Database site description:
+  Haartbeestpoort - HT03 
+
+Database site coordinates:
+ latitude -24.27777 
+ longitude 28.10472 
+
+Data extraction:
+ 2025-09-13 11:21:21 using script barcode.R v 20.2 with the macro option, under R version 4.4.3 (2025-02-28) 
+
+Abbreviations:
+
+mon_variable_abbr measure_unit_abbr mon_variable_name measure_unit_name mon_variable_id
+Ca-Diss-Water                         mg/L                                  Calcium                               Milligram per Litre                   52                                   
+Cl-Diss-Water                         mg/L                                  Chloride                              Milligram per Litre                   46                                   
+DMS-Tot-Water                         mg/L                                  Dissolved Major Salts                 Milligram per Litre                   63                                   
+EC-Phys-Water                         mS/m                                  Electrical Conductivity               Millisiemens per Metre                56                                   
+F-Diss-Water                          mg/L                                  Fluoride                              Milligram per Litre                   24                                   
+K-Diss-Water                          mg/L                                  Potassium                             Milligram per Litre                   50                                   
+KJEL N-Tot-Water                      mg/L                                  Kjeldahl Nitrogen                     Milligram per Litre                    9                                   
+Mg-Diss-Water                         mg/L                                  Magnesium                             Milligram per Litre                   32                                   
+Na-Diss-Water                         mg/L                                  Sodium                                Milligram per Litre                   30                                   
+NH4-N-Diss-Water                      mg/L                                  Ammonium Nitrogen                     Milligram per Litre                   13                                   
+NO3+NO2-N-Diss-Water                  mg/L                                  Nitrate + Nitrite Nitrogen            Milligram per Litre                   11                                   
+P-Tot-Water                           mg/L                                  Total Phosphorus                      Milligram per Litre                   37                                   
+pH-Diss-Water                         pH units                              pH                                    Units of pH                            3                                   
+PO4-P-Diss-Water                      mg/L                                  Ortho Phosphate as Phosphorus         Milligram per Litre                   39                                   
+Si-Diss-Water                         mg/L                                  Silicon                               Milligram per Litre                   34                                   
+SO4-Diss-Water                        mg/L                                  Sulphate                              Milligram per Litre                   42                                   
+TAL-Diss-Water                        mg/L                                  Total Alkalinity as Calcium Carbonate Milligram per Litre                   27                                   
+
+Dates when laboratory methods were in use (detection limit range in brackets):
+
+2002-01-29 12:01 to 2002-01-29 12:01 DMS-Tot-Water () Not a laboratory method.
+2002-01-29 12:01 to 2002-01-29 12:01 EC-Phys-Water (2) RQIS. EC. Automated Measurement, Temperature Compensated to 25 LT B0 Gt C
+2002-01-29 12:01 to 2002-01-29 12:01 pH-Diss-Water (2) PH. Automated Measurement - 2 Point Calibration. Instrument: Radiometer TTT85
+2002-01-29 12:01 to 2002-01-29 12:01 Na-Diss-Water (2) RQIS. Na. Automated. Flame Emission. LP Gas. 0.45 LT B5 Gt M Membrane. Jenway Pfp 7
+2002-01-29 12:01 to 2002-01-29 12:01 K-Diss-Water (0.3) RQIS. K. Automated. Flame Emission. LP Gas. 0.45 LT B5 Gt M Membrane. Jenway Pfp 7
+2002-01-29 12:01 to 2002-01-29 12:01 Ca-Diss-Water (1) RQIS. CA. Automated. AA Spectrophotometer. Potassium Ionisation Buffer. Air/Acetylene. 0.45 LT B5 Gt M. Varian AA-1275. 422.7 nm
+2002-01-29 12:01 to 2002-01-29 12:01 Mg-Diss-Water (1) RQIS. Mg. Automated. AA Spectrophotometer. Potassium Ionization Buffer. Air/Acetylene. 0.45 LT B5 Gt M. Varian AA-1275. 285.2 nm
+2002-01-29 12:01 to 2002-01-29 12:01 Cl-Diss-Water (10) RQIS. Cl. Automated. Colorimetric. Ferric Thiocyanate. 0.45 LT B5 Gt M Membrane. TRAACS. 480 nm
+2002-01-29 12:01 to 2002-01-29 12:01 SO4-Diss-Water (4) RQIS. SO4. Automated. Colorimetric. Turbidimetric. 0.45 LT B5 Gt M Membrane. TRAACS. 420 nm
+2002-01-29 12:01 to 2002-01-29 12:01 TAL-Diss-Water (4) RQIS. TAL. Automated. Colorimetric. Bromophenol Blue. 0.45 LT B5 Gt M Membrane. Technicon Auto Analyzer. 600 nm
+2002-01-29 12:01 to 2002-01-29 12:01 F-Diss-Water (0.1) RQIS. F. Automated. Ion Selective Electrode. 0.45 LT B5 Gt M Membrane. Technicon Auto Analyzer
+2002-01-29 12:01 to 2002-01-29 12:01 PO4-P-Diss-Water (0.011) RQIS. PO4-P. Automated. Colorimetric. Ortho-Phosphate as Phosphomolybdate. 0.45 LT B5 Gt M Membrane Filter. TRAACS. 660 nm
+2002-01-29 12:01 to 2002-01-29 12:01 NO3+NO2-N-Diss-Water (0.04) RQIS. NO3+NO2-N. Automated. Colorimetric. Cadmium Reduction, Diazo Dye. 0.45 LT B5 Gt M Membrane. TRAACS. 520.0 nm
+2002-01-29 12:01 to 2002-01-29 12:01 NH4-N-Diss-Water (0.04) RQIS. NH4-N. Automated. Colorimetric. Indophenol-Blue. 0.45 LT B5 Gt M Membrane. TRAACS. 630 nm
+2002-01-29 12:01 to 2002-01-29 12:01 Si-Diss-Water (0.4) RQIS. Si. Automated. Colorimetric. Molybdate Blue. 0.45 LT B5 Gt M Membrane. TRAACS. 660 nm
+
+Dates when detection limits were in effect - they may overlap:
+
+2002-01-29 12:01 to 2002-01-29 12:01 EC-Phys-Water detection limit = 2
+2002-01-29 12:01 to 2002-01-29 12:01 pH-Diss-Water detection limit = 2
+2002-01-29 12:01 to 2002-01-29 12:01 Na-Diss-Water detection limit = 2
+2002-01-29 12:01 to 2002-01-29 12:01 K-Diss-Water detection limit = 0.3
+2002-01-29 12:01 to 2002-01-29 12:01 Ca-Diss-Water detection limit = 1
+2002-01-29 12:01 to 2002-01-29 12:01 Mg-Diss-Water detection limit = 1
+2002-01-29 12:01 to 2002-01-29 12:01 Cl-Diss-Water detection limit = 10
+2002-01-29 12:01 to 2002-01-29 12:01 SO4-Diss-Water detection limit = 4
+2002-01-29 12:01 to 2002-01-29 12:01 TAL-Diss-Water detection limit = 4
+2002-01-29 12:01 to 2002-01-29 12:01 F-Diss-Water detection limit = 0.1
+2002-01-29 12:01 to 2002-01-29 12:01 PO4-P-Diss-Water detection limit = 0.011
+2002-01-29 12:01 to 2002-01-29 12:01 NO3+NO2-N-Diss-Water detection limit = 0.04
+2002-01-29 12:01 to 2002-01-29 12:01 NH4-N-Diss-Water detection limit = 0.04
+2002-01-29 12:01 to 2002-01-29 12:01 Si-Diss-Water detection limit = 0.4
+
+
+Disclaimer:
+
+While staff have taken due care in preparing these results, the Department of Water and Sanitation cannot be held responsible for the accuracy of data provided nor for interpretations made.
+
+Scientific complications in the attached interpretation or accompanying graphs are beyond the scope of this report.
+
+Please inform us of any results or site descriptions that appear to be incorrect.
+
+
+Contact:
+
+For data directly from the WMS database, please contact Resource Quality Information Services, Department of Water and Sanitation.
+www.dws.gov.za/iwqs/ 
+Landline: +27 12 808 9610 (frequently out of order)
+Cell: +27 82 908 2895, or see https://www.dws.gov.za/iwqs/egotour/staflist/callus.aspx
+Fax: +27 12 808 0338
+
+For official correspondence, please write to:
+The Director,
+Resource Quality Information Services,
+Department of Water and Sanitation,
+Private Bag X313
+Pretoria
+South Africa
+0001
