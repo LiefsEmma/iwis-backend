@@ -84,3 +84,14 @@ class CitizenReportRead(CitizenReportBase):
     id: int
     created_at: datetime
     status: str
+
+
+class AlertRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    reading_id: Optional[int]
+    alert_type: str
+    threshold_val: Optional[float]
+    created_at: datetime
+    resolved: bool

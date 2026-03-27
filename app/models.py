@@ -58,3 +58,18 @@ class CitizenReport(Base):
     status = Column(String(30), nullable=False, default="new", index=True)
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
+
+from sqlalchemy import Boolean, Column, Float, ForeignKey, Integer, String, DateTime
+from sqlalchemy.sql import func
+from .database import Base
+
+
+class Alert(Base):
+    __tablename__ = "alerts"
+
+    id = Column(Integer, primary_key=True, index=True) # Using Integer to keep it simple, or UUID if you configured it that way
+    reading_id = Column(Integer, ForeignKey("water_readings.id", ondelete="CASCADE"))
+    alert_type = Column(String(150), nullable=False)
+    threshold_val = Column(Float)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    resolved = Column(Boolean, default=False)
