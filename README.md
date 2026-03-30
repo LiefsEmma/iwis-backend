@@ -1,56 +1,61 @@
-# IWIS Backend - FastAPI + PostgreSQL
+# Integrated Water Information System - Backend
 
-This backend powers the **Integrated Water Information System (IWIS)** with:
-- FastAPI for API endpoints
-- PostgreSQL for environmental data storage
-- latitude/longitude coordinates for map data
+# Integrated Water Information System (IWIS) - Backend
 
-## Tech Stack
-- **Framework:** FastAPI
-- **Database:** PostgreSQL
-- **ORM:** SQLAlchemy
+This is the FastAPI backend for the Integrated Water Information System (IWIS), a digital monitoring and analytics platform designed to address ecological degradation at Hartbeespoort Dam. It handles data ingestion from environmental sensors, manages citizen-scientist reports, processes automated alerts, and performs real-time exploratory data analysis (EDA).
 
-## Local Setup
+## Features
+* **REST API:** Fast, asynchronous endpoints built with FastAPI.
+* **Spatial Database:** PostgreSQL integration with PostGIS for mapping sensor locations and citizen reports.
+* **Automated Alerting:** Database triggers automatically generate alerts when ecological thresholds (e.g., nitrates > 5.0 mg/L) are breached.
+* **Real-Time Analysis:** On-the-fly Pearson correlation matrices calculated using Pandas.
+* **Data Seeding:** Built-in Python script to populate the database with realistic, historical trend data.
 
-### 1. Create and activate a virtual environment
+## Prerequisites
+* Python 3.10+
+* PostgreSQL (with the PostGIS extension)
+* A terminal environment (Linux/macOS recommended)
+
+## Installation & Setup
+
+**1. Clone the repository**
 ```bash
-python3 -m venv venv
+git clone git@github.com:LiefsEmma/iwis-backend.git
+```
+**2. Create and activate a virtual environment**
+```bash
+python -m venv venv
 source venv/bin/activate
 ```
-
-### 2. Install dependencies
+**3. Install dependencies**
 ```bash
 pip install -r requirements.txt
+pip install pandas psycopg2-binary requests
 ```
-
-### 3. Create `.env`
-Copy `.env.example` to `.env` and configure your DB connection:
-
-```env
-DATABASE_URL=postgresql+psycopg2://postgres:postgres@localhost:5432/iwis
-```
-
-### 4. Start the API
+**4. Database setup**
 ```bash
-fastapi dev app/main.py
+sudo systemctl start postgresql
+sudo -u postgres createdb iwis
 ```
 
-API base URL: `http://127.0.0.1:8000`
+## Running the application
 
-## Main Endpoints
-- `GET /health`
-- `POST /sensors`
-- `GET /sensors`
-- `POST /water-readings`
-- `GET /water-readings`
-- `POST /weather-readings`
-- `GET /weather-readings`
-- `POST /citizen-reports`
-- `GET /citizen-reports`
-- `GET /map/sensors` (GeoJSON)
-- `GET /map/citizen-reports` (GeoJSON)
+**1. Start the FastAPI server**
+```bash
+uvicorn app.main:app --reload
+```
+> The server will at `http://127.0.0.1:8000`. The database tables will be automatically generated upton the first successful connection.
 
-## API Docs
-- Swagger UI: `http://127.0.0.1:8000/docs`
-- ReDoc: `http://127.0.0.1:8000/redoc`
+**2. Seed the database**
+
+> Open a second a terminal, and run the seeder script
+```bash
+python seed_data.py
+```
+
+## API Documentation
+Once the server is running, FastAPI will automatically generate API documentations
+
+- **Swagger UI:** `http://127.0.0.1:8000/docs`
+- **ReDoc:** `http://127.0.0.1:8000/redoc`
 
