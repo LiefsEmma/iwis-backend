@@ -20,7 +20,7 @@ This is the FastAPI backend for the Integrated Water Information System (IWIS), 
 
 **1. Clone the repository**
 ```bash
-git clone git@github.com:LiefsEmma/iwis-backend.git
+git clone git@github.com:username/iwis-backend.git
 ```
 **2. Create and activate a virtual environment**
 ```bash
