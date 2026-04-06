@@ -95,3 +95,7 @@ class AlertRead(BaseModel):
     threshold_val: Optional[float]
     created_at: datetime
     resolved: bool
+
+class AlertUpdate(BaseModel):
+    resolved: bool
+
