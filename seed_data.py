@@ -46,6 +46,7 @@ def seed_database():
                 "ph": round(random.uniform(6.8, 8.5), 2),
                 "temperature_c": round(temp, 1),
                 "nitrates_mg_l": round(nitrate, 2),
+                "phosphate_mg_l": round(random.uniform(0.1, 4.0), 2),
                 "turbidity_ntu": round(random.uniform(5.0, 50.0), 1),
                 "dissolved_oxygen_mg_l": round(random.uniform(4.0, 8.0), 2),
                 "latitude": HARTIES_LAT,
@@ -66,8 +67,8 @@ def seed_database():
     print("Weather reading generated.")
 
     reports = [
-        {"description": "Thick green algae bloom near the boat club.", "reporter_name": "citizen-scientist", "latitude": HARTIES_LAT - 0.01, "longitude": HARTIES_LNG + 0.02},
-        {"description": "Strong chemical smell and dead fish on the eastern shore.", "reporter_name": "field-worker", "latitude": HARTIES_LAT + 0.005, "longitude": HARTIES_LNG + 0.015}
+        {"description": "Thick green algae bloom near the boat club.", "reporter_name": "Lerato K.", "report_type": "citizen-scientist", "latitude": HARTIES_LAT - 0.01, "longitude": HARTIES_LNG + 0.02},
+        {"description": "Strong chemical smell and dead fish on the eastern shore.", "reporter_name": "Thabo M.", "report_type": "field-worker", "latitude": HARTIES_LAT + 0.005, "longitude": HARTIES_LNG + 0.015}
     ]
     for r in reports:
         requests.post(f"{BASE_URL}/citizen-reports", json=r)
