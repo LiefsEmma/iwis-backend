@@ -16,7 +16,19 @@ This is the FastAPI backend for the Integrated Water Information System (IWIS), 
 
 ## Quick Start (New Users)
 
-**1. Start PostgreSQL Service**
+**1. Create a Virtual Environment**
+Navigate to the project root and create the shared `venv` folder:
+
+- **macOS / Linux:**
+  ```bash
+  python -m venv venv
+  ```
+- **Windows (PowerShell):**
+  ```powershell
+  python -m venv venv
+  ```
+
+**2. Start PostgreSQL Service**
 Ensure the PostgreSQL server is running on port `5432`:
 
 - **Windows (PowerShell):**
@@ -33,7 +45,7 @@ Ensure the PostgreSQL server is running on port `5432`:
   sudo systemctl start postgresql
   ```
 
-**2. Database Setup**
+**3. Database Setup**
 Create the `iwis` database:
 
 - **Windows (PowerShell):**
@@ -49,8 +61,8 @@ Create the `iwis` database:
   sudo -u postgres createdb iwis
   ```
 
-**3. Configure Environment**
-Copy the example environment file and update your credentials:
+**4. Configure Environment**
+From the `iwis-backend` directory, copy the example environment file:
 
 - **macOS / Linux:**
   ```bash
@@ -66,8 +78,8 @@ Update `.env` with your database URL (using `127.0.0.1` is recommended):
 DATABASE_URL=postgresql+psycopg2://postgres:YOUR_PASSWORD@127.0.0.1:5432/iwis
 ```
 
-**4. Install Dependencies**
-The project uses a shared virtual environment (`venv`) located in the root directory.
+**5. Install Dependencies**
+The project uses the `venv` created in Step 1. From the project root:
 
 - **macOS / Linux:**
   ```bash
@@ -80,7 +92,7 @@ The project uses a shared virtual environment (`venv`) located in the root direc
   .\venv\Scripts\pip install websockets
   ```
 
-**5. Start the FastAPI Server**
+**6. Start the FastAPI Server**
 From the `iwis-backend` directory:
 
 - **macOS / Linux:**
@@ -94,7 +106,7 @@ From the `iwis-backend` directory:
 
 The server will be available at `http://127.0.0.1:8000`.
 
-**6. Seed Historical Data (Optional)**
+**7. Seed Historical Data (Optional)**
 Populate the database with realistic trend data for testing:
 
 - **macOS / Linux:**
