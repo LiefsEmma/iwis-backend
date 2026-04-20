@@ -61,10 +61,6 @@ class CitizenReport(Base):
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
 
-from sqlalchemy import Boolean, Column, Float, ForeignKey, Integer, String, DateTime
-from sqlalchemy.sql import func
-from .database import Base
-
 
 class Alert(Base):
     __tablename__ = "alerts"
