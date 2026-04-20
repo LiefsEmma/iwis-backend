@@ -29,6 +29,7 @@ class WaterReadingBase(BaseModel):
     ph: float = Field(..., ge=0, le=14)
     temperature_c: float = Field(..., ge=-5, le=60)
     nitrates_mg_l: float = Field(..., ge=0, le=500)
+    phosphate_mg_l: Optional[float] = Field(None, ge=0, le=500)
     turbidity_ntu: float = Field(..., ge=0, le=10000)
     dissolved_oxygen_mg_l: float = Field(..., ge=0, le=25)
     latitude: float = Field(..., ge=-90, le=90)
@@ -70,6 +71,7 @@ class CitizenReportBase(BaseModel):
     description: Optional[str] = Field(default=None, max_length=2000)
     photo_url: Optional[str] = Field(default=None, max_length=500)
     reporter_name: Optional[str] = Field(default=None, max_length=120)
+    report_type: Optional[str] = Field(default="citizen-scientist", max_length=50)
     latitude: float = Field(..., ge=-90, le=90)
     longitude: float = Field(..., ge=-180, le=180)
 
@@ -92,6 +94,7 @@ class AlertRead(BaseModel):
     id: int
     reading_id: Optional[int]
     alert_type: str
+    severity: str
     threshold_val: Optional[float]
     created_at: datetime
     resolved: bool
