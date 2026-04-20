@@ -1,9 +1,8 @@
 import pandas as pd
 from sqlalchemy.orm import Session
-from app.database import engine, SessionLocal
+from app.database import SessionLocal
 from app import models
 import glob
-import os
 
 def run_etl():
     print("Starting ETL process for historical data...")
