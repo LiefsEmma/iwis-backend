@@ -1,18 +1,15 @@
 from typing import Any, Dict, List, Optional
 import json
-import asyncio
 from datetime import datetime
 
 from fastapi import Depends, FastAPI, HTTPException, Query, WebSocket, WebSocketDisconnect, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from sqlalchemy import func
 
 from . import models, schemas
 from .database import Base, engine, get_db
 
 import pandas as pd
-import numpy as np
 
 
 app = FastAPI(title="IWIS Backend")
@@ -486,9 +483,12 @@ def get_wqi_summary(db: Session = Depends(get_db)) -> Dict[str, Any]:
     avg_wqi = sum(wqi_values) / len(wqi_values)
     
     status = "Excellent"
-    if avg_wqi < 50: status = "Poor"
-    elif avg_wqi < 70: status = "Fair"
-    elif avg_wqi < 90: status = "Good"
+    if avg_wqi < 50:
+        status = "Poor"
+    elif avg_wqi < 70:
+        status = "Fair"
+    elif avg_wqi < 90:
+        status = "Good"
     
     return {
         "current_wqi": round(avg_wqi, 1),
@@ -498,7 +498,7 @@ def get_wqi_summary(db: Session = Depends(get_db)) -> Dict[str, Any]:
 
 @app.get("/alerts", response_model=List[schemas.AlertRead])
 def list_alerts(db: Session = Depends(get_db)) -> List[schemas.AlertRead]:
-    alerts = db.query(models.Alert).filter(models.Alert.resolved == False).order_by(models.Alert.created_at.desc()).limit(10).all()
+    alerts = db.query(models.Alert).filter(not models.Alert.resolved).order_by(models.Alert.created_at.desc()).limit(10).all()
     return alerts
 
 @app.put("/alerts/{alert_id}/status", response_model=schemas.AlertRead)
