@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Dict, Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -68,12 +68,17 @@ class WeatherReadingRead(WeatherReadingBase):
 
 
 class CitizenReportBase(BaseModel):
+    title: Optional[str] = Field(default=None, max_length=200)
     description: Optional[str] = Field(default=None, max_length=2000)
     photo_url: Optional[str] = Field(default=None, max_length=500)
     reporter_name: Optional[str] = Field(default=None, max_length=120)
-    report_type: Optional[str] = Field(default="citizen-scientist", max_length=50)
+    reporter_role: Optional[str] = Field(default="citizen", max_length=50)
+    report_type: Optional[str] = Field(default="observation", max_length=50)
+    severity: Optional[str] = Field(default="low", max_length=20)
+    category: Optional[str] = Field(default=None, max_length=50)
     latitude: float = Field(..., ge=-90, le=90)
     longitude: float = Field(..., ge=-180, le=180)
+    role_specific_data: Optional[Dict[str, Any]] = None
 
 
 class CitizenReportCreate(CitizenReportBase):
@@ -99,6 +104,6 @@ class AlertRead(BaseModel):
     created_at: datetime
     resolved: bool
 
+
 class AlertUpdate(BaseModel):
     resolved: bool
-

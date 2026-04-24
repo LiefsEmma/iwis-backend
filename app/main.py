@@ -294,56 +294,43 @@ def create_citizen_report(
     db: Session = Depends(get_db),
 ) -> schemas.CitizenReportRead:
     report = models.CitizenReport(
+        title=payload.title,
         description=payload.description,
         photo_url=payload.photo_url,
         reporter_name=payload.reporter_name,
+        reporter_role=payload.reporter_role,
         report_type=payload.report_type,
+        severity=payload.severity,
+        category=payload.category,
         latitude=payload.latitude,
         longitude=payload.longitude,
+        role_specific_data=payload.role_specific_data,
     )
     db.add(report)
     db.commit()
     db.refresh(report)
 
-    return schemas.CitizenReportRead(
-        id=report.id,
-        created_at=report.created_at,
-        description=report.description,
-        photo_url=report.photo_url,
-        reporter_name=report.reporter_name,
-        report_type=report.report_type,
-        status=report.status,
-        latitude=report.latitude,
-        longitude=report.longitude,
-    )
+    return report
 
 
 @app.get("/citizen-reports", response_model=List[schemas.CitizenReportRead])
 def list_citizen_reports(
     status: Optional[str] = None,
+    reporter_role: Optional[str] = None,
+    category: Optional[str] = None,
     limit: int = Query(default=200, ge=1, le=1000),
     db: Session = Depends(get_db),
 ) -> List[schemas.CitizenReportRead]:
     query = db.query(models.CitizenReport)
     if status:
         query = query.filter(models.CitizenReport.status == status)
+    if reporter_role:
+        query = query.filter(models.CitizenReport.reporter_role == reporter_role)
+    if category:
+        query = query.filter(models.CitizenReport.category == category)
 
     reports = query.order_by(models.CitizenReport.created_at.desc()).limit(limit).all()
-
-    return [
-        schemas.CitizenReportRead(
-            id=report.id,
-            created_at=report.created_at,
-            description=report.description,
-            photo_url=report.photo_url,
-            reporter_name=report.reporter_name,
-            report_type=report.report_type,
-            status=report.status,
-            latitude=report.latitude,
-            longitude=report.longitude,
-        )
-        for report in reports
-    ]
+    return reports
 
 
 @app.get("/map/sensors")
@@ -404,6 +391,31 @@ def citizen_reports_geojson(db: Session = Depends(get_db)) -> Dict[str, Any]:
     ]
 
     return {"type": "FeatureCollection", "features": features}
+
+from sqlalchemy import cast, Date, func
+
+...
+@app.get("/analysis/trends")
+def get_wqi_trends(
+    days: int = Query(default=30, ge=1, le=365),
+    db: Session = Depends(get_db)
+) -> List[Dict[str, Any]]:
+    # Calculate daily average WQI
+    # In a real app, this would be a more efficient query or a materialized view
+    readings = db.query(models.WaterReading).order_by(models.WaterReading.recorded_at.desc()).limit(2000).all()
+    
+    if not readings:
+        return []
+        
+    df = pd.DataFrame([{
+        "date": r.recorded_at.date(),
+        "wqi": calculate_wqi(r)
+    } for r in readings])
+    
+    trends = df.groupby("date")["wqi"].mean().round(2).reset_index()
+    trends["date"] = trends["date"].apply(lambda x: x.isoformat())
+    
+    return trends.to_dict(orient="records")
 
 @app.get("/analysis/correlations")
 def get_realtime_correlations(

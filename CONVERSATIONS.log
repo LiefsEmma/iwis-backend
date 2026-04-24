@@ -1,0 +1,4 @@
+Updated iwis-backend README.md with multi-platform (Windows, macOS, Linux) setup and run instructions.
+Enhanced backend README.md with explicit PostgreSQL service start commands for all platforms.
+Finalized iwis-backend README.md with venv creation, DB service management, and multi-platform support.
+Updated macOS createdb command in README to include the -U postgres flag.

@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String, Text, func
+from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String, Text, func, JSON
 from sqlalchemy.orm import relationship
 
 from .database import Base
@@ -53,13 +53,18 @@ class CitizenReport(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), index=True)
+    title = Column(String(200), nullable=True)
     reporter_name = Column(String(120), nullable=True)
-    report_type = Column(String(50), nullable=True, default="citizen-scientist")
+    reporter_role = Column(String(50), nullable=True, default="citizen")
+    report_type = Column(String(50), nullable=True, default="observation")
+    severity = Column(String(20), nullable=True, default="low")
+    category = Column(String(50), nullable=True) # e.g., "pollution", "wildlife", "infrastructure"
     description = Column(Text, nullable=True)
     photo_url = Column(String(500), nullable=True)
     status = Column(String(30), nullable=False, default="new", index=True)
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
+    role_specific_data = Column(JSON, nullable=True) # For ground worker specific fields
 
 
 class Alert(Base):

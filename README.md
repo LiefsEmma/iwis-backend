@@ -54,7 +54,7 @@ Create the `iwis` database:
   ```
 - **macOS (Homebrew):**
   ```bash
-  createdb iwis
+  createdb -U postgres iwis
   ```
 - **Linux:**
   ```bash
