@@ -212,6 +212,21 @@ def sensors_geojson(db: Session = Depends(get_db)) -> Dict[str, Any]:
     return {"type": "FeatureCollection", "features": features}
 
 
+@app.get("/map/citizen-reports")
+def reports_geojson(db: Session = Depends(get_db)) -> Dict[str, Any]:
+    reports = db.query(models.CitizenReport).all()
+    features = []
+    for r in reports:
+        features.append(_feature(r.id, r.latitude, r.longitude, {
+            "title": r.title,
+            "description": r.description,
+            "category": r.category,
+            "severity": r.severity,
+            "created_at": r.created_at.isoformat()
+        }))
+    return {"type": "FeatureCollection", "features": features}
+
+
 @app.get("/analysis/trends")
 def get_wqi_trends(db: Session = Depends(get_db)) -> List[Dict[str, Any]]:
     readings = db.query(models.WaterReading).order_by(models.WaterReading.recorded_at.desc()).limit(1000).all()
