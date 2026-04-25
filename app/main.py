@@ -242,3 +242,30 @@ def get_realtime_correlations(db: Session = Depends(get_db)) -> Dict[str, Any]:
         "statistics": df.describe().round(2).to_dict(),
         "sample_size": len(df)
     }
+
+@app.get("/alerts", response_model=List[schemas.AlertRead])
+def list_alerts(db: Session = Depends(get_db)) -> List[schemas.AlertRead]:
+    return db.query(models.Alert).order_by(models.Alert.created_at.desc()).limit(50).all()
+
+@app.put("/alerts/{alert_id}/status", response_model=schemas.AlertRead)
+def update_alert_status(
+    alert_id: int,
+    payload: schemas.AlertUpdate,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+):
+    alert = db.query(models.Alert).filter(models.Alert.id == alert_id).first()
+    if not alert:
+        raise HTTPException(status_code=404, detail="Alert not found")
+    
+    alert.resolved = payload.resolved
+    db.commit()
+    db.refresh(alert)
+    
+    # Broadcast the update
+    background_tasks.add_task(manager.broadcast, json.dumps({
+        "type": "update_alert", 
+        "data": schemas.AlertRead.model_validate(alert).model_dump(mode='json')
+    }))
+    
+    return alert
