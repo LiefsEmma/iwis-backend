@@ -243,6 +243,52 @@ def get_realtime_correlations(db: Session = Depends(get_db)) -> Dict[str, Any]:
         "sample_size": len(df)
     }
 
+@app.get("/analysis/hotspots")
+def get_pollution_hotspots(db: Session = Depends(get_db)) -> List[Dict[str, Any]]:
+    # Simple algorithm: Find locations with high nitrate or phosphate
+    high_pollution_readings = db.query(models.WaterReading).filter(
+        (models.WaterReading.nitrates_mg_l > 4.0) | (models.WaterReading.phosphate_mg_l > 1.5)
+    ).order_by(models.WaterReading.recorded_at.desc()).limit(100).all()
+    
+    hotspots = []
+    for r in high_pollution_readings:
+        intensity = "low"
+        if r.nitrates_mg_l > 8.0 or (r.phosphate_mg_l and r.phosphate_mg_l > 3.0):
+            intensity = "high"
+        elif r.nitrates_mg_l > 5.0 or (r.phosphate_mg_l and r.phosphate_mg_l > 2.0):
+            intensity = "medium"
+            
+        hotspots.append({
+            "id": f"hotspot-{r.id}",
+            "lat": r.latitude,
+            "lng": r.longitude,
+            "intensity": intensity,
+            "radiusMeters": 400 + (r.nitrates_mg_l * 20)
+        })
+    return hotspots
+
+
+@app.get("/analysis/wqi-summary")
+def get_wqi_summary(db: Session = Depends(get_db)) -> Dict[str, Any]:
+    latest_readings = db.query(models.WaterReading).order_by(models.WaterReading.recorded_at.desc()).limit(50).all()
+    if not latest_readings:
+        return {"current_wqi": 0, "status": "No data"}
+        
+    wqi_values = [calculate_wqi(r) for r in latest_readings]
+    avg_wqi = sum(wqi_values) / len(wqi_values)
+    
+    status = "Excellent"
+    if avg_wqi < 50: status = "Poor"
+    elif avg_wqi < 70: status = "Fair"
+    elif avg_wqi < 90: status = "Good"
+    
+    return {
+        "current_wqi": round(avg_wqi, 1),
+        "status": status,
+        "sample_size": len(latest_readings)
+    }
+
+
 @app.get("/alerts", response_model=List[schemas.AlertRead])
 def list_alerts(db: Session = Depends(get_db)) -> List[schemas.AlertRead]:
     return db.query(models.Alert).order_by(models.Alert.created_at.desc()).limit(50).all()
