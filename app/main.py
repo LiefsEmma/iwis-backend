@@ -66,17 +66,12 @@ def calculate_wqi(reading: models.WaterReading) -> float:
 
 @app.on_event("startup")
 def on_startup() -> None:
-    # This will create tables if they don't exist
     Base.metadata.create_all(bind=engine)
 
 
 @app.get("/")
 def read_root() -> Dict[str, str]:
-    return {
-        "status": "online",
-        "message": "IWIS API is live",
-        "timestamp": datetime.now().isoformat()
-    }
+    return {"status": "online", "message": "IWIS API is live"}
 
 
 @app.get("/health")
@@ -120,26 +115,37 @@ def create_water_reading(
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
 ) -> schemas.WaterReadingRead:
-    water_reading = models.WaterReading(
-        sensor_id=payload.sensor_id,
-        ph=payload.ph,
-        temperature_c=payload.temperature_c,
-        nitrates_mg_l=payload.nitrates_mg_l,
-        phosphate_mg_l=payload.phosphate_mg_l,
-        turbidity_ntu=payload.turbidity_ntu,
-        dissolved_oxygen_mg_l=payload.dissolved_oxygen_mg_l,
-        latitude=payload.latitude,
-        longitude=payload.longitude,
-    )
+    water_reading = models.WaterReading(**payload.model_dump())
     db.add(water_reading)
     db.commit()
     db.refresh(water_reading)
     
-    # Broadcast update
+    # THRESHOLD CHECKER (The "Alert Generator")
+    if water_reading.nitrates_mg_l > 5.0:
+        severity = "high" if water_reading.nitrates_mg_l > 10.0 else "medium"
+        alert = models.Alert(
+            reading_id=water_reading.id,
+            alert_type="Nitrate Level Breach",
+            severity=severity,
+            threshold_val=water_reading.nitrates_mg_l,
+            resolved=False
+        )
+        db.add(alert)
+        db.commit()
+        db.refresh(alert)
+        
+        # Broadcast Alert
+        background_tasks.add_task(manager.broadcast, json.dumps({
+            "type": "new_alert", 
+            "data": schemas.AlertRead.model_validate(alert).model_dump(mode='json')
+        }))
+
+    # Broadcast reading
     background_tasks.add_task(manager.broadcast, json.dumps({
         "type": "new_reading", 
         "data": schemas.WaterReadingRead.model_validate(water_reading).model_dump(mode='json')
     }))
+    
     return water_reading
 
 
@@ -160,19 +166,7 @@ def create_citizen_report(
     payload: schemas.CitizenReportCreate,
     db: Session = Depends(get_db),
 ) -> schemas.CitizenReportRead:
-    report = models.CitizenReport(
-        title=payload.title,
-        description=payload.description,
-        photo_url=payload.photo_url,
-        reporter_name=payload.reporter_name,
-        reporter_role=payload.reporter_role,
-        report_type=payload.report_type,
-        severity=payload.severity,
-        category=payload.category,
-        latitude=payload.latitude,
-        longitude=payload.longitude,
-        role_specific_data=payload.role_specific_data,
-    )
+    report = models.CitizenReport(**payload.model_dump())
     db.add(report)
     db.commit()
     db.refresh(report)
@@ -200,10 +194,7 @@ def sensors_geojson(db: Session = Depends(get_db)) -> Dict[str, Any]:
     features = []
     for sensor in sensors:
         latest = db.query(models.WaterReading).filter(models.WaterReading.sensor_id == sensor.id).order_by(models.WaterReading.recorded_at.desc()).first()
-        properties = {
-            "name": sensor.name,
-            "is_active": sensor.is_active,
-        }
+        properties = {"name": sensor.name, "is_active": sensor.is_active}
         if latest:
             properties["latest_readings"] = {
                 "ph": latest.ph, "nitrate": latest.nitrates_mg_l, "temperature": latest.temperature_c, "dissolvedOxygen": latest.dissolved_oxygen_mg_l
@@ -218,11 +209,7 @@ def reports_geojson(db: Session = Depends(get_db)) -> Dict[str, Any]:
     features = []
     for r in reports:
         features.append(_feature(r.id, r.latitude, r.longitude, {
-            "title": r.title,
-            "description": r.description,
-            "category": r.category,
-            "severity": r.severity,
-            "created_at": r.created_at.isoformat()
+            "title": r.title, "description": r.description, "category": r.category, "severity": r.severity, "created_at": r.created_at.isoformat()
         }))
     return {"type": "FeatureCollection", "features": features}
 
@@ -241,17 +228,8 @@ def get_wqi_trends(db: Session = Depends(get_db)) -> List[Dict[str, Any]]:
 def get_realtime_correlations(db: Session = Depends(get_db)) -> Dict[str, Any]:
     readings = db.query(models.WaterReading).limit(1000).all()
     if len(readings) < 2: raise HTTPException(status_code=404, detail="Not enough data")
-    
-    data = [{
-        "ph": r.ph, 
-        "temp": r.temperature_c, 
-        "nitrate": r.nitrates_mg_l, 
-        "do": r.dissolved_oxygen_mg_l,
-        "turbidity": r.turbidity_ntu
-    } for r in readings]
-    
+    data = [{"ph": r.ph, "temp": r.temperature_c, "nitrate": r.nitrates_mg_l, "do": r.dissolved_oxygen_mg_l, "turbidity": r.turbidity_ntu} for r in readings]
     df = pd.DataFrame(data)
-    
     return {
         "correlations": df.corr().fillna(0).round(3).to_dict(),
         "statistics": df.describe().round(2).to_dict(),
@@ -260,73 +238,27 @@ def get_realtime_correlations(db: Session = Depends(get_db)) -> Dict[str, Any]:
 
 @app.get("/analysis/hotspots")
 def get_pollution_hotspots(db: Session = Depends(get_db)) -> List[Dict[str, Any]]:
-    # Simple algorithm: Find locations with high nitrate or phosphate
-    high_pollution_readings = db.query(models.WaterReading).filter(
-        (models.WaterReading.nitrates_mg_l > 4.0) | (models.WaterReading.phosphate_mg_l > 1.5)
-    ).order_by(models.WaterReading.recorded_at.desc()).limit(100).all()
-    
-    hotspots = []
-    for r in high_pollution_readings:
-        intensity = "low"
-        if r.nitrates_mg_l > 8.0 or (r.phosphate_mg_l and r.phosphate_mg_l > 3.0):
-            intensity = "high"
-        elif r.nitrates_mg_l > 5.0 or (r.phosphate_mg_l and r.phosphate_mg_l > 2.0):
-            intensity = "medium"
-            
-        hotspots.append({
-            "id": f"hotspot-{r.id}",
-            "lat": r.latitude,
-            "lng": r.longitude,
-            "intensity": intensity,
-            "radiusMeters": 400 + (r.nitrates_mg_l * 20)
-        })
-    return hotspots
-
+    high_pollution_readings = db.query(models.WaterReading).filter((models.WaterReading.nitrates_mg_l > 4.0) | (models.WaterReading.phosphate_mg_l > 1.5)).limit(100).all()
+    return [{"id": f"hotspot-{r.id}", "lat": r.latitude, "lng": r.longitude, "intensity": "high" if r.nitrates_mg_l > 8.0 else "medium", "radiusMeters": 400 + (r.nitrates_mg_l * 20)} for r in high_pollution_readings]
 
 @app.get("/analysis/wqi-summary")
 def get_wqi_summary(db: Session = Depends(get_db)) -> Dict[str, Any]:
-    latest_readings = db.query(models.WaterReading).order_by(models.WaterReading.recorded_at.desc()).limit(50).all()
-    if not latest_readings:
-        return {"current_wqi": 0, "status": "No data"}
-        
-    wqi_values = [calculate_wqi(r) for r in latest_readings]
-    avg_wqi = sum(wqi_values) / len(wqi_values)
-    
-    status = "Excellent"
-    if avg_wqi < 50: status = "Poor"
-    elif avg_wqi < 70: status = "Fair"
-    elif avg_wqi < 90: status = "Good"
-    
-    return {
-        "current_wqi": round(avg_wqi, 1),
-        "status": status,
-        "sample_size": len(latest_readings)
-    }
-
+    latest = db.query(models.WaterReading).order_by(models.WaterReading.recorded_at.desc()).limit(50).all()
+    if not latest: return {"current_wqi": 0, "status": "No data"}
+    wqi_vals = [calculate_wqi(r) for r in latest]
+    avg = sum(wqi_vals) / len(wqi_vals)
+    return {"current_wqi": round(avg, 1), "status": "Excellent" if avg > 90 else "Good" if avg > 70 else "Fair"}
 
 @app.get("/alerts", response_model=List[schemas.AlertRead])
 def list_alerts(db: Session = Depends(get_db)) -> List[schemas.AlertRead]:
     return db.query(models.Alert).order_by(models.Alert.created_at.desc()).limit(50).all()
 
 @app.put("/alerts/{alert_id}/status", response_model=schemas.AlertRead)
-def update_alert_status(
-    alert_id: int,
-    payload: schemas.AlertUpdate,
-    background_tasks: BackgroundTasks,
-    db: Session = Depends(get_db),
-):
+def update_alert_status(alert_id: int, payload: schemas.AlertUpdate, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     alert = db.query(models.Alert).filter(models.Alert.id == alert_id).first()
-    if not alert:
-        raise HTTPException(status_code=404, detail="Alert not found")
-    
+    if not alert: raise HTTPException(status_code=404, detail="Alert not found")
     alert.resolved = payload.resolved
     db.commit()
     db.refresh(alert)
-    
-    # Broadcast the update
-    background_tasks.add_task(manager.broadcast, json.dumps({
-        "type": "update_alert", 
-        "data": schemas.AlertRead.model_validate(alert).model_dump(mode='json')
-    }))
-    
+    background_tasks.add_task(manager.broadcast, json.dumps({"type": "update_alert", "data": schemas.AlertRead.model_validate(alert).model_dump(mode='json')}))
     return alert
