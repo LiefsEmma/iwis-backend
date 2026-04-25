@@ -226,9 +226,19 @@ def get_wqi_trends(db: Session = Depends(get_db)) -> List[Dict[str, Any]]:
 def get_realtime_correlations(db: Session = Depends(get_db)) -> Dict[str, Any]:
     readings = db.query(models.WaterReading).limit(1000).all()
     if len(readings) < 2: raise HTTPException(status_code=404, detail="Not enough data")
-    data = [{"ph": r.ph, "temp": r.temperature_c, "nitrate": r.nitrates_mg_l, "do": r.dissolved_oxygen_mg_l} for r in readings]
+    
+    data = [{
+        "ph": r.ph, 
+        "temp": r.temperature_c, 
+        "nitrate": r.nitrates_mg_l, 
+        "do": r.dissolved_oxygen_mg_l,
+        "turbidity": r.turbidity_ntu
+    } for r in readings]
+    
     df = pd.DataFrame(data)
+    
     return {
         "correlations": df.corr().fillna(0).round(3).to_dict(),
+        "statistics": df.describe().round(2).to_dict(),
         "sample_size": len(df)
     }
