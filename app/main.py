@@ -1,6 +1,7 @@
 from typing import Any, Dict, List, Optional
 import json
 import os
+import re
 from datetime import datetime
 
 from fastapi import Depends, FastAPI, HTTPException, Query, WebSocket, WebSocketDisconnect, BackgroundTasks
@@ -109,6 +110,21 @@ def _build_chat_context(db: Session) -> str:
     )
 
 
+def _looks_like_greeting_or_test(message: str) -> bool:
+    text = message.strip().lower()
+    return text in {"test", "hi", "hello", "hey", "yo", "hallo"}
+
+
+def _looks_like_swimming_question(message: str) -> bool:
+    text = message.lower()
+    return bool(re.search(r"swim|swimming|swem|safe|veilig", text))
+
+
+def _looks_like_nitrate_question(message: str) -> bool:
+    text = message.lower()
+    return "nitrate" in text or "nitrates" in text or "nitraat" in text
+
+
 @app.post("/chat", response_model=schemas.ChatResponse)
 def chat_with_ai(payload: schemas.ChatRequest, db: Session = Depends(get_db)) -> schemas.ChatResponse:
     api_key = os.getenv("GROQ_API_KEY")
@@ -116,7 +132,69 @@ def chat_with_ai(payload: schemas.ChatRequest, db: Session = Depends(get_db)) ->
         raise HTTPException(status_code=500, detail="GROQ_API_KEY is not configured")
 
     context = _build_chat_context(db)
+    latest = db.query(models.WaterReading).order_by(models.WaterReading.recorded_at.desc()).first()
     model = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
+
+    if _looks_like_greeting_or_test(payload.message):
+        return schemas.ChatResponse(
+            bot_response=(
+                "Hi! I am your IWIS assistant. I can answer questions about recent readings, nitrates, alerts, "
+                "and whether conditions look safe based on available data."
+            )
+        )
+
+    if latest is None:
+        if _looks_like_swimming_question(payload.message):
+            return schemas.ChatResponse(
+                bot_response=(
+                    "I cannot confirm swimming safety yet because there are no recent water readings in IWIS. "
+                    "Please treat it as unknown risk until new measurements are available."
+                )
+            )
+        if _looks_like_nitrate_question(payload.message):
+            return schemas.ChatResponse(
+                bot_response=(
+                    "There is no recent nitrate reading available in IWIS yet, so I cannot assess current risk. "
+                    "For this platform, nitrate alerts are triggered above 5.0 mg/L."
+                )
+            )
+        return schemas.ChatResponse(
+            bot_response=(
+                "I do not have recent water reading data yet. Ask me again after new sensor data is ingested, "
+                "or ask about platform features and alerts."
+            )
+        )
+
+    if _looks_like_nitrate_question(payload.message):
+        threshold = 5.0
+        risk = "low"
+        if latest.nitrates_mg_l > 10.0:
+            risk = "high"
+        elif latest.nitrates_mg_l > threshold:
+            risk = "medium"
+
+        return schemas.ChatResponse(
+            bot_response=(
+                f"The latest nitrate level is {latest.nitrates_mg_l:.2f} mg/L (recorded at {latest.recorded_at.isoformat()}). "
+                f"Using IWIS alert rules (> {threshold:.1f} mg/L), this is currently a {risk} risk reading."
+            )
+        )
+
+    if _looks_like_swimming_question(payload.message):
+        ph_ok = 6.5 <= latest.ph <= 8.5
+        nitrate_ok = latest.nitrates_mg_l <= 5.0
+        do_ok = latest.dissolved_oxygen_mg_l >= 5.0
+        turb_ok = latest.turbidity_ntu <= 5.0
+        signals_ok = sum([ph_ok, nitrate_ok, do_ok, turb_ok])
+        verdict = "likely acceptable with caution" if signals_ok >= 3 else "not recommended right now"
+
+        return schemas.ChatResponse(
+            bot_response=(
+                f"Based on the latest IWIS reading (pH {latest.ph:.2f}, nitrate {latest.nitrates_mg_l:.2f} mg/L, "
+                f"DO {latest.dissolved_oxygen_mg_l:.2f} mg/L, turbidity {latest.turbidity_ntu:.2f} NTU), "
+                f"swimming is {verdict}. Please still follow official local advisories."
+            )
+        )
 
     history: List[Dict[str, str]] = []
     for item in payload.history[-10:]:
@@ -133,9 +211,11 @@ def chat_with_ai(payload: schemas.ChatRequest, db: Session = Depends(get_db)) ->
                     "role": "system",
                     "content": (
                         "You are the IWIS assistant for Hartbeespoort Dam. "
-                        "Use the provided live platform context when relevant. "
-                        "If data is missing, say so clearly and avoid making up facts. "
-                        f"Live platform context: {context}"
+                        "Always answer in 2-4 concise sentences. "
+                        "Use only the provided context and never invent values. "
+                        "If a value is missing, explicitly say it is unavailable. "
+                        "Do not include meta text such as 'Live platform context' in your answer. "
+                        f"Context: {context}"
                     ),
                 },
                 *history,
