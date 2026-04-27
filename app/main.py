@@ -117,7 +117,15 @@ def _looks_like_greeting_or_test(message: str) -> bool:
 
 def _looks_like_swimming_question(message: str) -> bool:
     text = message.lower()
-    return bool(re.search(r"swim|swimming|swem|safe|veilig", text))
+    return bool(
+        re.search(
+            r"swim|swimming|can i swim|safe to swim|"
+            r"zwem|zwemmen|mag ik zwemmen|"
+            r"veilig|veiligheid|"
+            r"water safe",
+            text,
+        )
+    )
 
 
 def _looks_like_nitrate_question(message: str) -> bool:
