@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, Optional
 import json
+import os
 from datetime import datetime
 
 from fastapi import Depends, FastAPI, HTTPException, Query, WebSocket, WebSocketDisconnect, BackgroundTasks
@@ -10,6 +11,7 @@ from . import models, schemas
 from .database import Base, engine, get_db
 
 import pandas as pd
+from groq import Groq
 
 
 app = FastAPI(title="IWIS Backend")
@@ -85,6 +87,65 @@ def read_root() -> Dict[str, str]:
 @app.get("/health")
 def healthcheck() -> Dict[str, str]:
     return {"status": "ok"}
+
+
+def _build_chat_context(db: Session) -> str:
+    latest = db.query(models.WaterReading).order_by(models.WaterReading.recorded_at.desc()).first()
+    alerts_count = db.query(models.Alert).filter(models.Alert.resolved.is_(False)).count()
+    reports_count = db.query(models.CitizenReport).count()
+
+    if latest is None:
+        return (
+            "No recent water reading data is available yet. "
+            f"Open alerts: {alerts_count}. Citizen reports: {reports_count}."
+        )
+
+    return (
+        f"Latest water reading at {latest.recorded_at.isoformat()}: "
+        f"pH={latest.ph}, temperature_c={latest.temperature_c}, nitrates_mg_l={latest.nitrates_mg_l}, "
+        f"phosphate_mg_l={latest.phosphate_mg_l}, turbidity_ntu={latest.turbidity_ntu}, "
+        f"dissolved_oxygen_mg_l={latest.dissolved_oxygen_mg_l}. "
+        f"Open alerts: {alerts_count}. Citizen reports: {reports_count}."
+    )
+
+
+@app.post("/chat", response_model=schemas.ChatResponse)
+def chat_with_ai(payload: schemas.ChatRequest, db: Session = Depends(get_db)) -> schemas.ChatResponse:
+    api_key = os.getenv("GROQ_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=500, detail="GROQ_API_KEY is not configured")
+
+    context = _build_chat_context(db)
+    model = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
+
+    history: List[Dict[str, str]] = []
+    for item in payload.history[-10:]:
+        if item.role in {"user", "assistant"}:
+            history.append({"role": item.role, "content": item.content.strip()[:2000]})
+
+    try:
+        client = Groq(api_key=api_key)
+        completion = client.chat.completions.create(
+            model=model,
+            temperature=0.2,
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You are the IWIS assistant for Hartbeespoort Dam. "
+                        "Use the provided live platform context when relevant. "
+                        "If data is missing, say so clearly and avoid making up facts. "
+                        f"Live platform context: {context}"
+                    ),
+                },
+                *history,
+                {"role": "user", "content": payload.message.strip()},
+            ],
+        )
+        answer = completion.choices[0].message.content or "No response generated."
+        return schemas.ChatResponse(bot_response=answer.strip())
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Failed to generate chat response: {exc}")
 
 
 @app.websocket("/ws/live")
