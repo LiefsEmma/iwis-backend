@@ -107,3 +107,17 @@ class AlertRead(BaseModel):
 
 class AlertUpdate(BaseModel):
     resolved: bool
+
+
+class ChatMessage(BaseModel):
+    role: str = Field(..., min_length=1, max_length=20)
+    content: str = Field(..., min_length=1, max_length=4000)
+
+
+class ChatRequest(BaseModel):
+    message: str = Field(..., min_length=1, max_length=2000)
+    history: list[ChatMessage] = Field(default_factory=list, max_length=20)
+
+
+class ChatResponse(BaseModel):
+    bot_response: str
