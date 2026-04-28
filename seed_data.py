@@ -1,80 +1,113 @@
-import requests
+import os
 import random
 from datetime import datetime, timedelta
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from dotenv import load_dotenv
 
-BASE_URL = "http://localhost:8000"
-HARTIES_LAT = -25.7343
-HARTIES_LNG = 27.8587
+# Use the same models as the app
+from app.models import Base, Sensor, WaterReading, WeatherReading, CitizenReport
+
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+psycopg2://postgres:postgres@127.0.0.1:5432/iwis")
 
 def seed_database():
-    print("Starting database seed...")
+    print(f"Connecting to database for seeding: {DATABASE_URL.split('@')[-1]}")
+    engine = create_engine(DATABASE_URL)
+    SessionLocal = sessionmaker(bind=engine)
+    db = SessionLocal()
 
-    sensors = [
-        {"name": "North Shore Auto-Sampler", "sensor_type": "Water Quality", "latitude": HARTIES_LAT + 0.011, "longitude": HARTIES_LNG - 0.03, "is_active": True},
-        {"name": "Central Basin Buoy", "sensor_type": "Multi-parameter", "latitude": HARTIES_LAT - 0.004, "longitude": HARTIES_LNG + 0.006, "is_active": True}
-    ]
-    
-    sensor_ids = []
-    for s in sensors:
-        res = requests.post(f"{BASE_URL}/sensors", json=s)
-        if res.status_code == 201:
-            sensor_ids.append(res.json()["id"])
-            print(f"Created sensor: {s['name']}")
-        else:
-            print(f"Failed to create sensor. Is the server running? {res.text}")
-            return
+    try:
+        # 1. Create Sensors if they don't exist
+        sensors = [
+            {"name": "North Shore Auto-Sampler", "sensor_type": "Static Buoy", "lat": -25.725, "lng": 27.855},
+            {"name": "Central Basin Buoy", "sensor_type": "Mobile Platform", "lat": -25.735, "lng": 27.865},
+        ]
 
-    print(f"Generating 30 days of water readings for {len(sensor_ids)} sensors...")
-    now = datetime.now()
-    
-    for sensor_id in sensor_ids:
-        # Base values to create a realistic trend
-        base_nitrate = 1.2
-        base_temp = 22.0
+        db_sensors = []
+        for s_data in sensors:
+            existing = db.query(Sensor).filter(Sensor.name == s_data["name"]).first()
+            if not existing:
+                s = Sensor(
+                    name=s_data["name"],
+                    sensor_type=s_data["sensor_type"],
+                    latitude=s_data["lat"],
+                    longitude=s_data["lng"],
+                    is_active=True
+                )
+                db.add(s)
+                db.commit()
+                db.refresh(s)
+                db_sensors.append(s)
+                print(f"Created sensor: {s.name}")
+            else:
+                db_sensors.append(existing)
+
+        # 2. Generate 30 days of data
+        print("Generating 30 days of historical data...")
+        start_date = datetime.now() - timedelta(days=30)
         
-        for days_ago in range(30, -1, -1):
-            base_nitrate += random.uniform(-0.2, 0.3)
-            base_temp += random.uniform(-0.5, 0.6)
-            nitrate = max(0.1, min(base_nitrate, 8.0))
-            temp = max(10.0, min(base_temp, 35.0))
+        for day in range(31):
+            current_time = start_date + timedelta(days=day)
             
-            reading_time = now - timedelta(days=days_ago)
+            for sensor in db_sensors:
+                # Water Reading
+                wr = WaterReading(
+                    sensor_id=sensor.id,
+                    recorded_at=current_time,
+                    ph=round(random.uniform(6.5, 8.5), 2),
+                    temperature_c=round(random.uniform(18.0, 26.0), 1),
+                    nitrates_mg_l=round(random.uniform(0.5, 12.0), 2),
+                    phosphate_mg_l=round(random.uniform(0.1, 4.0), 2),
+                    turbidity_ntu=round(random.uniform(1.0, 45.0), 1),
+                    dissolved_oxygen_mg_l=round(random.uniform(3.0, 9.0), 1),
+                    latitude=sensor.latitude,
+                    longitude=sensor.longitude
+                )
+                db.add(wr)
+
+            # Weather Reading
+            weather = WeatherReading(
+                recorded_at=current_time,
+                wind_speed_m_s=round(random.uniform(0, 15), 1),
+                wind_direction_deg=random.randint(0, 359),
+                air_temperature_c=round(random.uniform(15, 30), 1),
+                latitude=-25.734,
+                longitude=27.858
+            )
+            db.add(weather)
             
-            reading = {
-                "sensor_id": sensor_id,
-                "recorded_at": reading_time.isoformat(),
-                "ph": round(random.uniform(6.8, 8.5), 2),
-                "temperature_c": round(temp, 1),
-                "nitrates_mg_l": round(nitrate, 2),
-                "phosphate_mg_l": round(random.uniform(0.1, 4.0), 2),
-                "turbidity_ntu": round(random.uniform(5.0, 50.0), 1),
-                "dissolved_oxygen_mg_l": round(random.uniform(4.0, 8.0), 2),
-                "latitude": HARTIES_LAT,
-                "longitude": HARTIES_LNG
-            }
-            requests.post(f"{BASE_URL}/water-readings", json=reading)
-            
-    print("Water readings generated.")
+        # 3. Add some reports
+        reports = [
+            {"title": "Heavy Algal Bloom", "category": "pollution", "severity": "high", "desc": "Significant green coverage near the yacht club."},
+            {"title": "Dead Fish Sighted", "category": "wildlife", "severity": "critical", "desc": "Multiple dead fish found near the north shore."},
+            {"title": "Illegal Dumping", "category": "pollution", "severity": "high", "desc": "Suspicious liquid being pumped into the dam."}
+        ]
 
-    weather = {
-        "wind_speed_m_s": round(random.uniform(2.0, 8.0), 1),
-        "wind_direction_deg": random.randint(0, 360),
-        "air_temperature_c": round(random.uniform(20.0, 32.0), 1),
-        "latitude": HARTIES_LAT,
-        "longitude": HARTIES_LNG
-    }
-    requests.post(f"{BASE_URL}/weather-readings", json=weather)
-    print("Weather reading generated.")
+        for r_data in reports:
+            report = CitizenReport(
+                title=r_data["title"],
+                category=r_data["category"],
+                severity=r_data["severity"],
+                description=r_data["desc"],
+                reporter_name="System Seeder",
+                reporter_role="official",
+                report_type="incident",
+                latitude=-25.7343 + random.uniform(-0.01, 0.01),
+                longitude=27.8587 + random.uniform(-0.01, 0.01),
+                status="new"
+            )
+            db.add(report)
 
-    reports = [
-        {"description": "Thick green algae bloom near the boat club.", "reporter_name": "Lerato K.", "report_type": "citizen-scientist", "latitude": HARTIES_LAT - 0.01, "longitude": HARTIES_LNG + 0.02},
-        {"description": "Strong chemical smell and dead fish on the eastern shore.", "reporter_name": "Thabo M.", "report_type": "field-worker", "latitude": HARTIES_LAT + 0.005, "longitude": HARTIES_LNG + 0.015}
-    ]
-    for r in reports:
-        requests.post(f"{BASE_URL}/citizen-reports", json=r)
-    print("Citizen reports generated.")
+        db.commit()
+        print("Database successfully seeded with historical data!")
 
-    print("Done!")
+    except Exception as e:
+        db.rollback()
+        print(f"Error during seeding: {e}")
+    finally:
+        db.close()
 
 if __name__ == "__main__":
     seed_database()
