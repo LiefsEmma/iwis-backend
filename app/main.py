@@ -411,3 +411,37 @@ def update_alert_status(alert_id: int, payload: schemas.AlertUpdate, background_
     db.refresh(alert)
     background_tasks.add_task(manager.broadcast, json.dumps({"type": "update_alert", "data": schemas.AlertRead.model_validate(alert).model_dump(mode='json')}))
     return alert
+
+@app.post("/chat", response_model=schemas.ChatResponse)
+def chatbot_interaction(payload: schemas.ChatRequest, db: Session = Depends(get_db)):
+    # Lightweight AI logic based on real dam data
+    msg = payload.message.lower()
+    
+    # Fetch some context
+    latest = db.query(models.WaterReading).order_by(models.WaterReading.recorded_at.desc()).first()
+    wqi_summary = get_wqi_summary(db)
+    active_alerts = db.query(models.Alert).filter(models.Alert.resolved == False).count()
+    
+    if "status" in msg or "condition" in msg or "how is" in msg:
+        response = f"Currently, the dam condition is rated as '{wqi_summary['status']}' with a WQI of {wqi_summary['current_wqi']}. "
+        if active_alerts > 0:
+            response += f"Note: There are {active_alerts} active alerts requiring attention."
+        else:
+            response += "All systems are within safe operating parameters."
+            
+    elif "swim" in msg or "safe" in msg:
+        if wqi_summary['status'] == "Excellent" or wqi_summary['status'] == "Good":
+            response = "Based on current WQI and nitrate levels, the water appears safe for primary contact. However, always check for visible algal blooms before entering."
+        else:
+            response = f"Caution: The current water health is rated as '{wqi_summary['status']}'. I would recommend avoiding contact until the WQI improves above 70."
+            
+    elif "nitrate" in msg or "chemical" in msg:
+        if latest:
+            response = f"The most recent nitrate reading is {latest.nitrates_mg_l} mg/L. The safety threshold is 5.0 mg/L."
+        else:
+            response = "I'm currently unable to retrieve specific chemical telemetry. Please check back in a moment."
+            
+    else:
+        response = "I am the IWIS Assistant. I can help you with the current status of Hartbeespoort Dam, safety information, or specific sensor readings. Try asking 'How is the water today?'"
+
+    return {"bot_response": response}
