@@ -26,3 +26,4 @@ urllib3==2.6.3
 uvicorn==0.42.0
 websockets
 psycopg2-binary
+groq==0.22.0
