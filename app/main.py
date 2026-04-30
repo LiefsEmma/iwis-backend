@@ -93,13 +93,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
 @app.post("/sensors", response_model=schemas.SensorRead, status_code=201)
 def create_sensor(payload: schemas.SensorCreate, db: Session = Depends(get_db)) -> schemas.SensorRead:
-    sensor = models.Sensor(
-        name=payload.name,
-        sensor_type=payload.sensor_type,
-        is_active=payload.is_active,
-        latitude=payload.latitude,
-        longitude=payload.longitude,
-    )
+    sensor = models.Sensor(**payload.model_dump())
     db.add(sensor)
     db.commit()
     db.refresh(sensor)
@@ -122,7 +116,6 @@ def create_water_reading(
     db.commit()
     db.refresh(water_reading)
     
-    # THRESHOLD CHECKER (The "Alert Generator")
     if water_reading.nitrates_mg_l > 5.0:
         severity = "high" if water_reading.nitrates_mg_l > 10.0 else "medium"
         alert = models.Alert(
@@ -134,15 +127,12 @@ def create_water_reading(
         )
         db.add(alert)
         db.commit()
-        db.refresh(alert)
         
-        # Broadcast Alert
         background_tasks.add_task(manager.broadcast, json.dumps({
             "type": "new_alert", 
             "data": schemas.AlertRead.model_validate(alert).model_dump(mode='json')
         }))
 
-    # Broadcast reading
     background_tasks.add_task(manager.broadcast, json.dumps({
         "type": "new_reading", 
         "data": schemas.WaterReadingRead.model_validate(water_reading).model_dump(mode='json')
@@ -272,20 +262,63 @@ def update_alert_status(alert_id: int, payload: schemas.AlertUpdate, background_
 @app.post("/chat", response_model=schemas.ChatResponse)
 def chatbot_interaction(payload: schemas.ChatRequest, db: Session = Depends(get_db)):
     msg = payload.message.lower()
-    latest = db.query(models.WaterReading).order_by(models.WaterReading.recorded_at.desc()).first()
-    wqi_summary = get_wqi_summary(db)
-    active_alerts = db.query(models.Alert).filter(models.Alert.resolved == False).count()
     
-    if "status" in msg or "condition" in msg or "how is" in msg:
-        response = f"Currently, the dam condition is rated as '{wqi_summary['status']}' with a WQI of {wqi_summary['current_wqi']}. "
-        if active_alerts > 0: response += f"Note: There are {active_alerts} active alerts requiring attention."
-        else: response += "All systems are within safe operating parameters."
-    elif "swim" in msg or "safe" in msg:
-        if wqi_summary['status'] in ["Excellent", "Good"]: response = "Based on current WQI and nitrate levels, the water appears safe for primary contact. However, always check for visible algal blooms before entering."
-        else: response = f"Caution: The current water health is rated as '{wqi_summary['status']}'. I would recommend avoiding contact until the WQI improves above 70."
-    elif "nitrate" in msg or "chemical" in msg:
-        if latest: response = f"The most recent nitrate reading is {latest.nitrates_mg_l} mg/L. The safety threshold is 5.0 mg/L."
-        else: response = "I'm currently unable to retrieve specific chemical telemetry. Please check back in a moment."
-    else: response = "I am the IWIS Assistant. I can help you with the current status of Hartbeespoort Dam, safety information, or specific sensor readings. Try asking 'How is the water today?'"
+    # DATA SNAPSHOT (Context for the bot)
+    latest = db.query(models.WaterReading).order_by(models.WaterReading.recorded_at.desc()).first()
+    wqi = get_wqi_summary(db)
+    active_alerts = db.query(models.Alert).filter(models.Alert.resolved == False).all()
+    report_count = db.query(models.CitizenReport).count()
+    sensor_count = db.query(models.Sensor).count()
+    pollution_hotspots = get_pollution_hotspots(db)
 
-    return {"bot_response": response}
+    # 1. CORE STATUS & WQI
+    if any(k in msg for k in ["status", "how is", "condition", "wqi", "health"]):
+        res = f"The overall health of Hartbeespoort Dam is currently rated as '{wqi['status']}' with a Water Quality Index of {wqi['current_wqi']}/100. "
+        if active_alerts:
+            res += f"I have detected {len(active_alerts)} active security breaches that require immediate attention."
+        else:
+            res += "All monitored parameters are currently within safe operational limits."
+        return {"bot_response": res}
+
+    # 2. SAFETY & SWIMMING
+    if any(k in msg for k in ["swim", "safe", "contact", "danger"]):
+        if wqi['current_wqi'] > 75:
+            res = f"Water quality is currently {wqi['current_wqi']} (Good). It appears safe for contact, but keep an eye out for surface algae."
+        else:
+            res = f"Caution recommended. The WQI is {wqi['current_wqi']} ({wqi['status']}). I advise against swimming until levels improve above 75."
+        return {"bot_response": res}
+
+    # 3. REPORT DATA
+    if any(k in msg for k in ["report", "sighting", "citizen", "people"]):
+        res = f"Our community is active! There are currently {report_count} environmental reports logged in the system. "
+        if report_count > 0:
+            latest_rep = db.query(models.CitizenReport).order_by(models.CitizenReport.created_at.desc()).first()
+            res += f"The most recent sighting was '{latest_rep.title}' regarding {latest_rep.category}."
+        return {"bot_response": res}
+
+    # 4. CHEMICALS & SENSORS
+    if any(k in msg for k in ["nitrate", "chemical", "ph", "temp", "oxygen", "sensor"]):
+        if not latest: return {"bot_response": "I'm unable to reach the sensors right now. Please check the 'Offline Mode' indicator on the dashboard."}
+        
+        if "nitrate" in msg:
+            res = f"Nitrate levels are {latest.nitrates_mg_l} mg/L. (Safety Limit: 5.0 mg/L)."
+        elif "ph" in msg:
+            res = f"The current alkalinity is pH {latest.ph}. Neutral is 7.0."
+        elif "temp" in msg:
+            res = f"Water temperature is {latest.temperature_c}°C."
+        elif "oxygen" in msg:
+            res = f"Dissolved Oxygen is at {latest.dissolved_oxygen_mg_l} mg/L."
+        else:
+            res = f"We have {sensor_count} active monitoring stations. The primary station is reporting: pH {latest.ph}, Nitrates {latest.nitrates_mg_l} mg/L, and Temp {latest.temperature_c}°C."
+        return {"bot_response": res}
+
+    # 5. POLLUTION & HOTSPOTS
+    if any(k in msg for k in ["pollution", "hotspot", "dirty", "where"]):
+        if pollution_hotspots:
+            res = f"I have identified {len(pollution_hotspots)} pollution hotspots in the basin. The most intense areas are currently showing high nitrate concentrations."
+        else:
+            res = "No significant pollution clusters are detected on the geospatial heatmap at this time."
+        return {"bot_response": res}
+
+    # 6. FALLBACK (Conversational)
+    return {"bot_response": "I am the IWIS Intelligent Assistant. I have real-time access to the dam's database. You can ask me about: \n- Water Quality (WQI)\n- Safety/Swimming info\n- Specific sensor data (Nitrates, pH, Temp)\n- Community reports and sightings."}
