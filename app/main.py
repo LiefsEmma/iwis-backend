@@ -13,7 +13,6 @@ from . import models, schemas
 from .database import Base, engine, get_db
 
 import pandas as pd
-from groq import Groq
 
 
 app = FastAPI(title="IWIS Backend")
@@ -82,152 +81,6 @@ def healthcheck() -> Dict[str, str]:
     return {"status": "ok"}
 
 
-def _build_chat_context(db: Session) -> str:
-    latest = db.query(models.WaterReading).order_by(models.WaterReading.recorded_at.desc()).first()
-    alerts_count = db.query(models.Alert).filter(models.Alert.resolved.is_(False)).count()
-    reports_count = db.query(models.CitizenReport).count()
-
-    if latest is None:
-        return (
-            "No recent water reading data is available yet. "
-            f"Open alerts: {alerts_count}. Citizen reports: {reports_count}."
-        )
-
-    return (
-        f"Latest water reading at {latest.recorded_at.isoformat()}: "
-        f"pH={latest.ph}, temperature_c={latest.temperature_c}, nitrates_mg_l={latest.nitrates_mg_l}, "
-        f"phosphate_mg_l={latest.phosphate_mg_l}, turbidity_ntu={latest.turbidity_ntu}, "
-        f"dissolved_oxygen_mg_l={latest.dissolved_oxygen_mg_l}. "
-        f"Open alerts: {alerts_count}. Citizen reports: {reports_count}."
-    )
-
-
-def _looks_like_greeting_or_test(message: str) -> bool:
-    text = message.strip().lower()
-    return text in {"test", "hi", "hello", "hey", "yo", "hallo"}
-
-
-def _looks_like_swimming_question(message: str) -> bool:
-    text = message.lower()
-    return bool(
-        re.search(
-            r"swim|swimming|can i swim|safe to swim|"
-            r"zwem|zwemmen|mag ik zwemmen|"
-            r"veilig|veiligheid|"
-            r"water safe",
-            text,
-        )
-    )
-
-
-def _looks_like_nitrate_question(message: str) -> bool:
-    text = message.lower()
-    return "nitrate" in text or "nitrates" in text or "nitraat" in text
-
-
-@app.post("/chat", response_model=schemas.ChatResponse)
-def chat_with_ai(payload: schemas.ChatRequest, db: Session = Depends(get_db)) -> schemas.ChatResponse:
-    api_key = os.getenv("GROQ_API_KEY")
-    if not api_key:
-        raise HTTPException(status_code=500, detail="GROQ_API_KEY is not configured")
-
-    context = _build_chat_context(db)
-    latest = db.query(models.WaterReading).order_by(models.WaterReading.recorded_at.desc()).first()
-    model = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
-
-    if _looks_like_greeting_or_test(payload.message):
-        return schemas.ChatResponse(
-            bot_response=(
-                "Hi! I am your IWIS assistant. I can answer questions about recent readings, nitrates, alerts, "
-                "and whether conditions look safe based on available data."
-            )
-        )
-
-    if latest is None:
-        if _looks_like_swimming_question(payload.message):
-            return schemas.ChatResponse(
-                bot_response=(
-                    "I cannot confirm swimming safety yet because there are no recent water readings in IWIS. "
-                    "Please treat it as unknown risk until new measurements are available."
-                )
-            )
-        if _looks_like_nitrate_question(payload.message):
-            return schemas.ChatResponse(
-                bot_response=(
-                    "There is no recent nitrate reading available in IWIS yet, so I cannot assess current risk. "
-                    "For this platform, nitrate alerts are triggered above 5.0 mg/L."
-                )
-            )
-        return schemas.ChatResponse(
-            bot_response=(
-                "I do not have recent water reading data yet. Ask me again after new sensor data is ingested, "
-                "or ask about platform features and alerts."
-            )
-        )
-
-    if _looks_like_nitrate_question(payload.message):
-        threshold = 5.0
-        risk = "low"
-        if latest.nitrates_mg_l > 10.0:
-            risk = "high"
-        elif latest.nitrates_mg_l > threshold:
-            risk = "medium"
-
-        return schemas.ChatResponse(
-            bot_response=(
-                f"The latest nitrate level is {latest.nitrates_mg_l:.2f} mg/L (recorded at {latest.recorded_at.isoformat()}). "
-                f"Using IWIS alert rules (> {threshold:.1f} mg/L), this is currently a {risk} risk reading."
-            )
-        )
-
-    if _looks_like_swimming_question(payload.message):
-        ph_ok = 6.5 <= latest.ph <= 8.5
-        nitrate_ok = latest.nitrates_mg_l <= 5.0
-        do_ok = latest.dissolved_oxygen_mg_l >= 5.0
-        turb_ok = latest.turbidity_ntu <= 5.0
-        signals_ok = sum([ph_ok, nitrate_ok, do_ok, turb_ok])
-        verdict = "likely acceptable with caution" if signals_ok >= 3 else "not recommended right now"
-
-        return schemas.ChatResponse(
-            bot_response=(
-                f"Based on the latest IWIS reading (pH {latest.ph:.2f}, nitrate {latest.nitrates_mg_l:.2f} mg/L, "
-                f"DO {latest.dissolved_oxygen_mg_l:.2f} mg/L, turbidity {latest.turbidity_ntu:.2f} NTU), "
-                f"swimming is {verdict}. Please still follow official local advisories."
-            )
-        )
-
-    history: List[Dict[str, str]] = []
-    for item in payload.history[-10:]:
-        if item.role in {"user", "assistant"}:
-            history.append({"role": item.role, "content": item.content.strip()[:2000]})
-
-    try:
-        client = Groq(api_key=api_key)
-        completion = client.chat.completions.create(
-            model=model,
-            temperature=0.2,
-            messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        "You are the IWIS assistant for Hartbeespoort Dam. "
-                        "Always answer in 2-4 concise sentences. "
-                        "Use only the provided context and never invent values. "
-                        "If a value is missing, explicitly say it is unavailable. "
-                        "Do not include meta text such as 'Live platform context' in your answer. "
-                        f"Context: {context}"
-                    ),
-                },
-                *history,
-                {"role": "user", "content": payload.message.strip()},
-            ],
-        )
-        answer = completion.choices[0].message.content or "No response generated."
-        return schemas.ChatResponse(bot_response=answer.strip())
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"Failed to generate chat response: {exc}")
-
-
 @app.websocket("/ws/live")
 async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
@@ -240,13 +93,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
 @app.post("/sensors", response_model=schemas.SensorRead, status_code=201)
 def create_sensor(payload: schemas.SensorCreate, db: Session = Depends(get_db)) -> schemas.SensorRead:
-    sensor = models.Sensor(
-        name=payload.name,
-        sensor_type=payload.sensor_type,
-        is_active=payload.is_active,
-        latitude=payload.latitude,
-        longitude=payload.longitude,
-    )
+    sensor = models.Sensor(**payload.model_dump())
     db.add(sensor)
     db.commit()
     db.refresh(sensor)
@@ -269,7 +116,6 @@ def create_water_reading(
     db.commit()
     db.refresh(water_reading)
     
-    # THRESHOLD CHECKER (The "Alert Generator")
     if water_reading.nitrates_mg_l > 5.0:
         severity = "high" if water_reading.nitrates_mg_l > 10.0 else "medium"
         alert = models.Alert(
@@ -281,15 +127,12 @@ def create_water_reading(
         )
         db.add(alert)
         db.commit()
-        db.refresh(alert)
         
-        # Broadcast Alert
         background_tasks.add_task(manager.broadcast, json.dumps({
             "type": "new_alert", 
             "data": schemas.AlertRead.model_validate(alert).model_dump(mode='json')
         }))
 
-    # Broadcast reading
     background_tasks.add_task(manager.broadcast, json.dumps({
         "type": "new_reading", 
         "data": schemas.WaterReadingRead.model_validate(water_reading).model_dump(mode='json')
@@ -396,7 +239,11 @@ def get_wqi_summary(db: Session = Depends(get_db)) -> Dict[str, Any]:
     if not latest: return {"current_wqi": 0, "status": "No data"}
     wqi_vals = [calculate_wqi(r) for r in latest]
     avg = sum(wqi_vals) / len(wqi_vals)
-    return {"current_wqi": round(avg, 1), "status": "Excellent" if avg > 90 else "Good" if avg > 70 else "Fair"}
+    status = "Excellent"
+    if avg < 50: status = "Poor"
+    elif avg < 70: status = "Fair"
+    elif avg < 90: status = "Good"
+    return {"current_wqi": round(avg, 1), "status": status}
 
 @app.get("/alerts", response_model=List[schemas.AlertRead])
 def list_alerts(db: Session = Depends(get_db)) -> List[schemas.AlertRead]:
@@ -411,3 +258,67 @@ def update_alert_status(alert_id: int, payload: schemas.AlertUpdate, background_
     db.refresh(alert)
     background_tasks.add_task(manager.broadcast, json.dumps({"type": "update_alert", "data": schemas.AlertRead.model_validate(alert).model_dump(mode='json')}))
     return alert
+
+@app.post("/chat", response_model=schemas.ChatResponse)
+def chatbot_interaction(payload: schemas.ChatRequest, db: Session = Depends(get_db)):
+    msg = payload.message.lower()
+    
+    # DATA SNAPSHOT (Context for the bot)
+    latest = db.query(models.WaterReading).order_by(models.WaterReading.recorded_at.desc()).first()
+    wqi = get_wqi_summary(db)
+    active_alerts = db.query(models.Alert).filter(models.Alert.resolved == False).all()
+    report_count = db.query(models.CitizenReport).count()
+    sensor_count = db.query(models.Sensor).count()
+    pollution_hotspots = get_pollution_hotspots(db)
+
+    # 1. CORE STATUS & WQI
+    if any(k in msg for k in ["status", "how is", "condition", "wqi", "health"]):
+        res = f"The overall health of Hartbeespoort Dam is currently rated as '{wqi['status']}' with a Water Quality Index of {wqi['current_wqi']}/100. "
+        if active_alerts:
+            res += f"I have detected {len(active_alerts)} active security breaches that require immediate attention."
+        else:
+            res += "All monitored parameters are currently within safe operational limits."
+        return {"bot_response": res}
+
+    # 2. SAFETY & SWIMMING
+    if any(k in msg for k in ["swim", "safe", "contact", "danger"]):
+        if wqi['current_wqi'] > 75:
+            res = f"Water quality is currently {wqi['current_wqi']} (Good). It appears safe for contact, but keep an eye out for surface algae."
+        else:
+            res = f"Caution recommended. The WQI is {wqi['current_wqi']} ({wqi['status']}). I advise against swimming until levels improve above 75."
+        return {"bot_response": res}
+
+    # 3. REPORT DATA
+    if any(k in msg for k in ["report", "sighting", "citizen", "people"]):
+        res = f"Our community is active! There are currently {report_count} environmental reports logged in the system. "
+        if report_count > 0:
+            latest_rep = db.query(models.CitizenReport).order_by(models.CitizenReport.created_at.desc()).first()
+            res += f"The most recent sighting was '{latest_rep.title}' regarding {latest_rep.category}."
+        return {"bot_response": res}
+
+    # 4. CHEMICALS & SENSORS
+    if any(k in msg for k in ["nitrate", "chemical", "ph", "temp", "oxygen", "sensor"]):
+        if not latest: return {"bot_response": "I'm unable to reach the sensors right now. Please check the 'Offline Mode' indicator on the dashboard."}
+        
+        if "nitrate" in msg:
+            res = f"Nitrate levels are {latest.nitrates_mg_l} mg/L. (Safety Limit: 5.0 mg/L)."
+        elif "ph" in msg:
+            res = f"The current alkalinity is pH {latest.ph}. Neutral is 7.0."
+        elif "temp" in msg:
+            res = f"Water temperature is {latest.temperature_c}°C."
+        elif "oxygen" in msg:
+            res = f"Dissolved Oxygen is at {latest.dissolved_oxygen_mg_l} mg/L."
+        else:
+            res = f"We have {sensor_count} active monitoring stations. The primary station is reporting: pH {latest.ph}, Nitrates {latest.nitrates_mg_l} mg/L, and Temp {latest.temperature_c}°C."
+        return {"bot_response": res}
+
+    # 5. POLLUTION & HOTSPOTS
+    if any(k in msg for k in ["pollution", "hotspot", "dirty", "where"]):
+        if pollution_hotspots:
+            res = f"I have identified {len(pollution_hotspots)} pollution hotspots in the basin. The most intense areas are currently showing high nitrate concentrations."
+        else:
+            res = "No significant pollution clusters are detected on the geospatial heatmap at this time."
+        return {"bot_response": res}
+
+    # 6. FALLBACK (Conversational)
+    return {"bot_response": "I am the IWIS Intelligent Assistant. I have real-time access to the dam's database. You can ask me about: \n- Water Quality (WQI)\n- Safety/Swimming info\n- Specific sensor data (Nitrates, pH, Temp)\n- Community reports and sightings."}
